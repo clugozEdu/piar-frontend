@@ -1,35 +1,23 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from "react";
+import { CssBaseline } from "@mui/material";
+import { useSelector } from "react-redux";
+import AppBarSite from "./common/components/layout/side-bar";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [advisorLogin, setAdvisorLogin] = useState([]);
+  const { advisor } = useSelector((state) => state.loginAdvisor);
+
+  useEffect(() => {
+    setAdvisorLogin([advisor]);
+  }, [advisor]);
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      {/* Init Layout */}
+      <CssBaseline />
+      {advisorLogin.length > 0 && <AppBarSite advisor={advisorLogin} />}
     </>
-  )
+  );
 }
 
-export default App
+export default App;
