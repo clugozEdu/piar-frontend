@@ -8,7 +8,7 @@ import {
   MenuItem,
   ListItemIcon,
   // Divider,
-  // Typography,
+  Typography,
   IconButton,
   Tooltip,
 } from "@mui/material";
@@ -37,7 +37,17 @@ function AccountMenu({ userName }) {
 
   return (
     <>
-      <Box sx={{ display: "flex", alignItems: "center", textAlign: "center" }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          textAlign: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Typography variant="body1" noWrap>
+          {userName}
+        </Typography>
         <Tooltip title="Account settings">
           <IconButton
             onClick={handleClick}

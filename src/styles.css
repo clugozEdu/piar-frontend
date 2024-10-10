@@ -1,0 +1,7 @@
+.swal2-popup.swal2-modal {
+  border-radius: 30px;
+}
+
+.swal2-container {
+  z-index: 9999;
+}
