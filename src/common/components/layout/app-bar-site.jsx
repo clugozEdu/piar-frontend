@@ -5,7 +5,6 @@ import { Drawer, Box } from "@mui/material";
 import PropTypes from "prop-types";
 // import NavLinksBreadcrumbs from "./Breadcrumbs";
 import { menuIconsBar, navLinks } from "./nav-links";
-// import ListSideBar from "./list-side-bar";
 import ListIconsMenu from "./list-icon-menu";
 import InitSideBar from "./init-side-bar";
 import AccountMenu from "../ui/account-menu";

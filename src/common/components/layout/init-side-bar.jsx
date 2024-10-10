@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { List, Toolbar } from "@mui/material";
 import PropTypes from "prop-types";
-import ListSideClickFZT from "@/feactures/clickFZT/components/list-side-clickFZT";
+import ListSideClickFZT from "@/feactures/clickFZT/components/list-side-click-fzt";
 
 /** Component to render to menu from menu selected
  * @param {array} listData - Array of objects with the list data
@@ -116,6 +116,7 @@ const InitSideBar = ({ listData, userLogin, selectedMenu }) => {
         {/** Render the menu items to clickFZT */}
         {contextMenu === "clickFZT" ? (
           /** Component ListSideCickFZT
+           * Render the list of the clickFZT menu
            * @param {object} advisorLogin - Object with the user login data
            */
           <ListSideClickFZT advisorLogin={userLogin} />

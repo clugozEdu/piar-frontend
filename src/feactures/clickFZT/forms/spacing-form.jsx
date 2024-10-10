@@ -29,72 +29,61 @@ const SpacingForm = ({ isSubmitting }) => {
   const filteredAdvisors = advisors.filter((adv) => adv.id !== advisor.id);
 
   return (
-    <Box
-      sx={{
-        p: 1,
-      }}
-      id="box-spacing-clickFZT-form"
-    >
-      <Grid container spacing={2} id="grid-container-spacing-form">
-        <TextFormField
-          name="title"
-          label="Título"
-          placeholder="Título del Espacio"
-          fullWidth
-          xs={12}
-          sm={12}
-          md={12}
-          lg={12}
-        />
+    <Grid container spacing={2} id="grid-container-spacing-form">
+      <TextFormField
+        name="title"
+        label="Título"
+        placeholder="Título del Espacio"
+        fullWidth
+        xs={12}
+        sm={12}
+        md={12}
+        lg={12}
+      />
 
-        <TextFormField
-          name="description"
-          label="Descripción"
-          placeholder="Descripción del Espacio"
-          fullWidth
-          xs={12}
-          sm={12}
-          md={12}
-          lg={12}
-        />
+      <TextFormField
+        name="description"
+        label="Descripción"
+        placeholder="Descripción del Espacio"
+        fullWidth
+        xs={12}
+        sm={12}
+        md={12}
+        lg={12}
+      />
 
-        <AutoCompleteFormField
-          name="advisor_ids"
-          label="Asesores"
-          placeholder="Asesores del Espacio"
-          options={filteredAdvisors}
-          getOptionLabel={(option) =>
-            `${option.first_name} ${option.last_name}`
-          }
-          getOptionSelectedValue={(option) => option.id}
-          xs={12}
-          sm={12}
-          md={12}
-          lg={12}
-          icon={<Person />}
-        />
+      <AutoCompleteFormField
+        name="advisor_ids"
+        label="Asesores"
+        placeholder="Asesores del Espacio"
+        options={filteredAdvisors}
+        getOptionLabel={(option) => `${option.first_name} ${option.last_name}`}
+        getOptionSelectedValue={(option) => option.id}
+        xs={12}
+        sm={12}
+        md={12}
+        lg={12}
+        icon={<Person />}
+      />
 
-        <Box sx={{ flex: "1 1 auto" }} />
+      <Box sx={{ flex: "1 1 auto" }} />
 
-        <Button
-          type="button"
-          variant="contained"
-          disabled={isSubmitting}
-          onClick={handleForSubmit}
-          startIcon={
-            isSubmitting ? <CircularProgress size={24} /> : <SaveIcon />
-          }
-          sx={{
-            backgroundColor: "#0dac3a",
-            "&:hover": {
-              backgroundColor: "#075f20",
-            },
-          }}
-        >
-          {isSubmitting ? "Guardando..." : "Guardar Espacio"}
-        </Button>
-      </Grid>
-    </Box>
+      <Button
+        type="button"
+        variant="contained"
+        disabled={isSubmitting}
+        onClick={handleForSubmit}
+        startIcon={isSubmitting ? <CircularProgress size={24} /> : <SaveIcon />}
+        sx={{
+          backgroundColor: "#0dac3a",
+          "&:hover": {
+            backgroundColor: "#075f20",
+          },
+        }}
+      >
+        {isSubmitting ? "Guardando..." : "Guardar Espacio"}
+      </Button>
+    </Grid>
   );
 };
 
