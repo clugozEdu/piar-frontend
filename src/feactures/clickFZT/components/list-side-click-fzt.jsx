@@ -8,7 +8,6 @@ import {
   Box,
   Menu,
   MenuItem,
-  Divider,
 } from "@mui/material";
 import {
   ExpandLess,
@@ -32,6 +31,7 @@ import AddList from "./add-lists";
 import ConfirmDeleteItems from "./delete-items";
 import SnackbarMessage from "@/common/components/ui/snackbar";
 import useWebSocket from "@/common/hooks/web-socket";
+import useLoading from "@/common/hooks/calllbacks/loading";
 
 /** Component ListSideClickFZT
  * Render the list of spacings and lists for the advisor
@@ -43,12 +43,12 @@ const ListSideClickFZT = ({ advisorLogin }) => {
   /** Init state the component */
   const [open, setOpen] = useState({});
   const [spacings, setSpacings] = useState([]);
-  const [isResponsible, setIsResponsible] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedSpacing, setSelectedSpacing] = useState(null);
   const [contextDialog, setContextDialog] = useState("");
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const { setIsLoading } = useLoading();
   const [showAlert, setShowAlert] = useState(false);
   const message = useWebSocket();
 
@@ -56,28 +56,42 @@ const ListSideClickFZT = ({ advisorLogin }) => {
    * useCallback: hook to save in cache the function
    * getData: function to get data from api
    * urlApi: api/clickup/spacing/advisor/${advisorLogin.id}
+   * setIsLoading: function to set loading
+   * Filter the spacings and lists to add the property "isOwner"
    * @param {string} advisorLogin.id - Id of the advisor login
    * @returns {array} spacings - Array of objects with the spacings
    * @returns {boolean} isResponsible - Boolean to check if the advisor is responsible
    *
    */
   const fetchSpacings = useCallback(() => {
-    getData(`api/clickup/spacing/advisor/${advisorLogin.id}`).then((data) => {
-      setSpacings(data);
-      /** Determine if resposible to spacing */
-      setIsResponsible(
-        data.some((spacing) => spacing.owner_advisor.id === advisorLogin.id)
-      );
+    setIsLoading(true);
+    getData(`api/clickup/spacing/advisor/`).then((data) => {
+      /** Add isOwner to spacing and list */
+      const updatedSpacings = data.map((spacing) => ({
+        ...spacing,
+        isOwner: spacing.owner_advisor.id === advisorLogin.id,
+        lists: spacing.lists.map((list) => ({
+          ...list,
+          isOwner: list.owner_advisor.id === advisorLogin.id,
+        })),
+      }));
+
+      setSpacings(updatedSpacings);
+      setIsLoading(false);
     });
-  }, [advisorLogin.id]);
+  }, [advisorLogin.id, setIsLoading]);
 
   /** UseEffect to fetchSpacing when the component is mounted
    * fetchSpacings: function to fetch spacings
    * dependecies: fetchSpacings
+   * setIsLoading: function to set loading
    */
   useEffect(() => {
     fetchSpacings();
-  }, [fetchSpacings]);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+  }, [fetchSpacings, setIsLoading]);
 
   /** UseEffect to read message to webSocket
    * @param {object} message - [Object] with the message from webSocket
@@ -86,11 +100,15 @@ const ListSideClickFZT = ({ advisorLogin }) => {
    * dependecies: message, fetchSpacings
    */
   useEffect(() => {
+    console.log(message);
     const event = message[0]?.event;
-    if (event === "spacing_created") {
+    if (event) {
       fetchSpacings();
     }
-  }, [message, fetchSpacings]);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+  }, [message, fetchSpacings, setIsLoading]);
 
   /** Handle to open and close item list
    * useCallback: hook to save in cache the function
@@ -124,12 +142,15 @@ const ListSideClickFZT = ({ advisorLogin }) => {
 
   /** Handle to close Menu
    * useCallback: hook to save in cache the function
+   * @param {boolean} clearSection - Boolean to clear spacing section
    * @returns {null} anchorEl - null anchorEl
    * @returns {null} selectedSpacing - null spacing
    */
-  const handleMenuClose = useCallback(() => {
+  const handleMenuClose = useCallback((clearSection = true) => {
     setAnchorEl(null);
-    setSelectedSpacing(null);
+    if (clearSection) {
+      setSelectedSpacing(null);
+    }
   }, []);
 
   /** Handle to detele click menu
@@ -154,8 +175,8 @@ const ListSideClickFZT = ({ advisorLogin }) => {
    * @returns {true} handleMenuClose - close menu
    */
   const handleEditSpacing = () => {
+    handleMenuClose(false); // Cierra el menú primero
     setContextDialog("editSpacing");
-    handleMenuClose();
     setIsDialogOpen(true);
   };
 
@@ -166,7 +187,7 @@ const ListSideClickFZT = ({ advisorLogin }) => {
    */
   const handleCreateList = () => {
     console.log(selectedSpacing);
-    handleMenuClose();
+    handleMenuClose(false);
     setContextDialog("createList");
     setIsDialogOpen(true);
   };
@@ -199,11 +220,19 @@ const ListSideClickFZT = ({ advisorLogin }) => {
             setOpenDialog={setIsDialogOpen}
             setShowAlert={setShowAlert}
             context={contextDialog}
+            idSpacing={selectedSpacing}
           />
         );
       /** Case create list */
       case "createList":
-        return <AddList />;
+        return (
+          <AddList
+            setOpenDialog={setIsDialogOpen}
+            setShowAlert={setShowAlert}
+            context={contextDialog}
+            idSpacing={selectedSpacing}
+          />
+        );
       default:
         return null;
     }
@@ -232,11 +261,11 @@ const ListSideClickFZT = ({ advisorLogin }) => {
           <ListItemText sx={{ pl: 1 }} primary="Crear Espacio" />
         </ListItemButton>
 
-        <Divider
+        {/* <Divider
           sx={{
             backgroundColor: "#0084cb",
           }}
-        />
+        /> */}
 
         {/* Component SpacingsList
          * @param {array} spacings - Array with the spacings
@@ -250,7 +279,6 @@ const ListSideClickFZT = ({ advisorLogin }) => {
           open={open}
           handleClick={handleClick}
           handleMenuClick={handleMenuClick}
-          isResponsible={isResponsible}
         />
       </List>
 
@@ -287,15 +315,18 @@ const ListSideClickFZT = ({ advisorLogin }) => {
             />
             Agregar Lista
           </MenuItem>
-          {/* Render menu delete spacing */}
-          <MenuItem onClick={handleDeleteClick}>
-            <Delete
-              sx={{
-                mr: 2,
-              }}
-            />
-            Eliminar Espacio
-          </MenuItem>
+          {/* Render menu delete spacing only if owner */}
+          {selectedSpacing &&
+            spacings.find((s) => s.id === selectedSpacing)?.isOwner && (
+              <MenuItem onClick={handleDeleteClick}>
+                <Delete
+                  sx={{
+                    mr: 2,
+                  }}
+                />
+                Eliminar Espacio
+              </MenuItem>
+            )}
         </Box>
       </Menu>
 
@@ -345,8 +376,9 @@ const SpacingsList = ({
   open,
   handleClick,
   handleMenuClick,
-  isResponsible,
+  // isResponsible,
 }) => {
+  console.log(spacings);
   return (
     <div>
       {spacings.map((spacing) => (
@@ -447,8 +479,8 @@ const SpacingsList = ({
                   {/* Render the List Text */}
                   <ListItemText sx={{ pl: 1 }} primary={list.title} />
 
-                  {/* Render the Delete Icon */}
-                  {isResponsible && (
+                  {/* Render the Delete Icon only is owner list */}
+                  {list.isOwner && (
                     <IconButton edge="end">
                       <Delete
                         sx={{
@@ -479,7 +511,6 @@ SpacingsList.propTypes = {
   open: PropTypes.object.isRequired,
   handleClick: PropTypes.func.isRequired,
   handleMenuClick: PropTypes.func.isRequired,
-  isResponsible: PropTypes.bool.isRequired,
 };
 
 /** PropTypes ListSideClickFZT

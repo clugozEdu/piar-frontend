@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import Grid from "@mui/material/Grid2";
 import * as Yup from "yup";
 import PropTypes from "prop-types";
-import { useSelector } from "react-redux";
 import FormInit from "@/common/components/form/form-init";
 import CardsForms from "@/common/components/ui/cards";
 import SpacingForm from "../forms/spacing-form";
-import { postData, getData } from "@/services/api";
+import { postData, getData, putData } from "@/services/api";
+import { CircularProgress } from "@mui/material";
 
 /** Component AddSpacing
  * Initial form to create or edit a spacing using Formik and Yup
@@ -16,9 +16,9 @@ import { postData, getData } from "@/services/api";
  * @returns {JSX.Element} - FormInit component
  */
 
-const AddSpacing = ({ setOpenDialog, setShowAlert, context }) => {
+const AddSpacing = ({ setOpenDialog, setShowAlert, context, idSpacing }) => {
+  // console.log(idSpacing);
   /** Init state the component */
-  const { advisor } = useSelector((state) => state.loginAdvisor);
   const [initValues, setInitValues] = useState({
     title: "",
     description: "",
@@ -36,8 +36,8 @@ const AddSpacing = ({ setOpenDialog, setShowAlert, context }) => {
    */
   useEffect(() => {
     if (context === "editSpacing") {
-      getData(`api/clickup/spacing/advisor/${advisor.id}`).then((data) => {
-        const spacing = data[0];
+      getData(`api/clickup/spacing/${idSpacing}`).then((data) => {
+        const spacing = data;
         setInitValues({
           title: spacing.title,
           description: spacing.description,
@@ -46,7 +46,7 @@ const AddSpacing = ({ setOpenDialog, setShowAlert, context }) => {
         setIsLoading(false);
       });
     }
-  }, [context, advisor.id]);
+  }, [context, idSpacing]);
 
   /** Function to validate the schema of the spacing
    * Yup: Library to validate the schema
@@ -55,13 +55,13 @@ const AddSpacing = ({ setOpenDialog, setShowAlert, context }) => {
   const validateShemaSpacing = () =>
     Yup.object({
       title: Yup.string().required("El título es requerido"),
-      description: Yup.string().required("La descripción es requerida"),
+      description: Yup.string().notRequired(),
       advisor_ids: Yup.array().notRequired(),
     });
 
   // Si está cargando en el contexto de edición, muestra un "Loading"
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <CircularProgress />;
   }
 
   return (
@@ -76,7 +76,9 @@ const AddSpacing = ({ setOpenDialog, setShowAlert, context }) => {
       initialValues={initValues}
       validationSchema={validateShemaSpacing}
       onSubmit={async (values) => {
-        await postData("api/clickup/spacing", values);
+        context === "editSpacing"
+          ? await putData(`api/clickup/spacing/${idSpacing}`, values)
+          : await postData("api/clickup/spacing/", values);
         setOpenDialog(false);
         setShowAlert(true);
       }}
@@ -127,6 +129,7 @@ AddSpacing.propTypes = {
   setOpenDialog: PropTypes.func.isRequired,
   setShowAlert: PropTypes.func,
   context: PropTypes.string,
+  idSpacing: PropTypes.string,
 };
 
 export default AddSpacing;

@@ -1,30 +1,27 @@
-import { forwardRef } from "react";
-import { Dialog, DialogContent, Slide } from "@mui/material";
+import { Dialog, DialogContent } from "@mui/material";
 import PropTypes from "prop-types";
 
+/** Dialog component
+ * @param {boolean} open - Dialog open state
+ * @param {function} onClose - Function to close the dialog
+ * @param {JSX.Element} children - Child component to render
+ */
 const CreateDialog = ({ open, onClose, children }) => {
-  const Transition = forwardRef(function Transition(props, ref) {
-    return <Slide direction="up" ref={ref} {...props} />;
-  });
-
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      TransitionComponent={Transition}
-      fullWidth
-      maxWidth="sm"
-    >
-      {/* <DialogTitle>{title}</DialogTitle> */}
+    <Dialog open={open} onClose={onClose} maxWidth="sm">
       <DialogContent>{children}</DialogContent>
     </Dialog>
   );
 };
 
+/** PropTypes
+ * @property {boolean} open - Dialog open state
+ * @property {function} onClose - Function to close the dialog
+ * @property {JSX.Element} children - Child component to render
+ */
 CreateDialog.propTypes = {
-  open: PropTypes.bool,
-  onClose: PropTypes.func,
-  // title: PropTypes.string,
+  open: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
   children: PropTypes.node,
 };
 

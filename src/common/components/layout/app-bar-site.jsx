@@ -9,7 +9,7 @@ import ListIconsMenu from "./list-icon-menu";
 import InitSideBar from "./init-side-bar";
 import AccountMenu from "../ui/account-menu";
 import LoadingGLobal from "../ui/loading-global";
-// import useLoading from "@/common/hooks/calllbacks/loading";
+import useLoading from "@/common/hooks/calllbacks/loading";
 import { useLocation } from "react-router-dom";
 
 /** Component to Init App Bars in site
@@ -20,7 +20,7 @@ const AppBarSite = ({ advisor }) => {
   /** Init state the component */
   const location = useLocation();
   const [selectedMenu, setSelectedMenu] = useState("home");
-  // const { isLoading, setIsLoading } = useLoading();
+  const { isLoading } = useLoading();
 
   /** UseEffect to set menu selected change */
   useEffect(() => {
@@ -34,7 +34,7 @@ const AppBarSite = ({ advisor }) => {
   return (
     <>
       {/** Loading */}
-      <LoadingGLobal />
+      {isLoading && <LoadingGLobal />}
       {/** Box to AppBar Site */}
       <Box
         id="box-app-bar-site"
@@ -87,6 +87,7 @@ const AppBarSite = ({ advisor }) => {
            * listData: Array of Objects from nav-links.js
            * userLogin: Object with the advisor data
            * selectedMenu: String with the selected menu
+           * loadingGlobal: Function to set the loading global
            * */}
           <InitSideBar
             listData={navLinks}

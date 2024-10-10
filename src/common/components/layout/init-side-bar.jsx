@@ -132,6 +132,7 @@ const InitSideBar = ({ listData, userLogin, selectedMenu }) => {
  * listData: Required: Array of objects with the list data
  * userLogin: Required: Object with the user login data
  * selectedMenu: Id of the selected menu
+ * loadingGlobal: Function to set the loading global
  */
 InitSideBar.propTypes = {
   listData: PropTypes.array.isRequired,
