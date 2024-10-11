@@ -8,6 +8,7 @@ import {
   MenuItem,
   Typography,
   Divider,
+  Tooltip,
 } from "@mui/material";
 import { CreateNewFolder, Home, Add, Delete } from "@mui/icons-material";
 import FolderSpecialIcon from "@mui/icons-material/FolderSpecial";
@@ -20,7 +21,7 @@ import CreateDialog from "../create-dialog";
 import AddSpacing from "../add-spacing";
 import AddList from "../add-lists";
 import ConfirmDeleteItems from "../delete-items";
-import SpacingsList from "./render-spacing-items";
+import SpacingsList from "./spacing-side-click-fzt";
 import SnackbarMessage from "@/common/components/ui/snackbar";
 import useWebSocket from "@/common/hooks/web-socket";
 import useLoading from "@/common/hooks/calllbacks/loading";
@@ -211,6 +212,7 @@ const ListSideClickFZT = ({ advisorLogin }) => {
            * @param {func} setShowAlert - Function to show alert message
            * @param {string} context - context to spacing edit or create
            */
+
           <AddSpacing
             openDialog={isDialogOpen}
             setOpenDialog={setIsDialogOpen}
@@ -223,6 +225,7 @@ const ListSideClickFZT = ({ advisorLogin }) => {
       case "createList":
         return (
           <AddList
+            openDialog={isDialogOpen}
             setOpenDialog={setIsDialogOpen}
             setShowAlert={setShowAlert}
             context={contextDialog}
@@ -253,7 +256,8 @@ const ListSideClickFZT = ({ advisorLogin }) => {
           />
           <ListItemText sx={{ pl: 1 }} primary="Inicio" />
         </ListItemButton>
-        {/* Render create spacing button */}
+
+        {/* Render create spacing button
         <ListItemButton
           onClick={handleCreateSpacing}
           sx={{
@@ -267,13 +271,7 @@ const ListSideClickFZT = ({ advisorLogin }) => {
             }}
           />
           <ListItemText sx={{ pl: 1 }} primary="Crear Espacio" />
-        </ListItemButton>
-
-        <Divider
-          sx={{
-            m: 1,
-          }}
-        />
+        </ListItemButton> */}
 
         {/* Render title Mis Espacios */}
         <Box
@@ -281,6 +279,7 @@ const ListSideClickFZT = ({ advisorLogin }) => {
             display: "flex",
             justifyContent: "start",
             alignItems: "center",
+            mt: 1,
           }}
         >
           <FolderSpecialIcon
@@ -295,11 +294,31 @@ const ListSideClickFZT = ({ advisorLogin }) => {
               ml: 1,
               mb: 0,
               mr: 1,
-              fontSize: "0.7rem",
+              fontSize: "1rem",
             }}
           >
             Mis Espacios
           </Typography>
+
+          <ListItemButton
+            sx={{
+              display: "flex",
+              justifyContent: "end",
+              padding: "0px 10px 0px 0px",
+              "&:hover": {
+                backgroundColor: "transparent",
+              },
+            }}
+            onClick={handleCreateSpacing}
+          >
+            <Tooltip title={"Crear Espacio"}>
+              <CreateNewFolder
+                sx={{
+                  fill: "#c9b202",
+                }}
+              />
+            </Tooltip>
+          </ListItemButton>
         </Box>
 
         <Divider
@@ -323,11 +342,6 @@ const ListSideClickFZT = ({ advisorLogin }) => {
           context={"owner"}
         />
 
-        <Divider
-          sx={{
-            m: 1,
-          }}
-        />
         {/* Render Espacios Compartidos */}
         <Box
           sx={{
@@ -348,12 +362,13 @@ const ListSideClickFZT = ({ advisorLogin }) => {
               ml: 1,
               mb: 0,
               mr: 1,
-              fontSize: "0.7rem",
+              fontSize: "1rem",
             }}
           >
             Espacios Compartidos
           </Typography>
         </Box>
+
         <Divider
           sx={{
             m: 1,

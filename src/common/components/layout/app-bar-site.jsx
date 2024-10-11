@@ -4,7 +4,7 @@ import { Outlet } from "react-router-dom";
 import { Drawer, Box } from "@mui/material";
 import PropTypes from "prop-types";
 // import NavLinksBreadcrumbs from "./Breadcrumbs";
-import { menuIconsBar, navLinks } from "./nav-links";
+import { menuIconsBar } from "./nav-links";
 import ListIconsMenu from "./list-icon-menu";
 import InitSideBar from "./init-side-bar";
 import AccountMenu from "../ui/account-menu";
@@ -80,7 +80,7 @@ const AppBarSite = ({ advisor }) => {
             width: "100%",
             maxWidth: 280,
             minWidth: 300,
-            padding: "5px 10px 15px 15px",
+            padding: "5px 1px 15px 15px",
           }}
         >
           {/** Component List Side Bar to all Icons Menu
@@ -90,7 +90,7 @@ const AppBarSite = ({ advisor }) => {
            * loadingGlobal: Function to set the loading global
            * */}
           <InitSideBar
-            listData={navLinks}
+            // listData={navLinks}
             userLogin={advisor[0]}
             selectedMenu={selectedMenu}
           />

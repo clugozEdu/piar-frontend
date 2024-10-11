@@ -1,13 +1,20 @@
 import { useEffect, useState } from "react";
-import Grid from "@mui/material/Grid2";
+import {
+  Typography,
+  DialogActions,
+  CircularProgress,
+  Button,
+} from "@mui/material";
+import SaveIcon from "@mui/icons-material/Save";
 import * as Yup from "yup";
 import { getData, postData, putData } from "@/services/api";
 import PropTypes from "prop-types";
 import FormInit from "@/common/components/form/form-init";
-import CardsForms from "@/common/components/ui/cards";
+import CreateDialog from "./create-dialog";
 import ListForm from "../forms/list-form";
 
 const AddList = ({
+  openDialog,
   setOpenDialog,
   setShowAlert,
   context,
@@ -47,51 +54,92 @@ const AddList = ({
       advisor_ids: Yup.array().notRequired(),
     });
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  const handleClose = () => {
+    setOpenDialog(false);
+  };
 
   return (
-    <FormInit
-      initialValues={initValues}
-      validationSchema={validateSchemaList}
-      onSubmit={async (values) => {
-        console.log(values);
-        context == "editList"
-          ? await putData(`api/clickup/list/${idList}`, values)
-          : await postData("api/clickup/list", values);
-        setOpenDialog(false);
-        setShowAlert(true);
-      }}
-      enableReinitialize={true}
+    <CreateDialog
+      title={
+        context === "createList" ? (
+          <>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              Creando Lista en {nameSpacing}
+            </Typography>
+            <Typography variant="body2" sx={{ flexGrow: 1 }}>
+              Una lista representa los principales departamentos u
+              organizaciones.
+            </Typography>
+          </>
+        ) : (
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            Editando Lista en {nameSpacing}
+          </Typography>
+        )
+      }
+      open={openDialog}
+      onClose={handleClose}
+      isLoading={isLoading}
     >
-      {({ isSubmitting }) => (
-        <Grid container spacing={2} id="spacing-init-form-grid">
-          <Grid size={12} id="spacing-init-form">
-            <CardsForms
-              title={
-                context === "createList"
-                  ? `Creando Lista en ${nameSpacing}`
-                  : "Formulario de Edición de Listas"
+      {!isLoading && initValues && (
+        <FormInit
+          initialValues={initValues}
+          validationSchema={validateSchemaList}
+          onSubmit={async (values, actions) => {
+            try {
+              if (context == "editList") {
+                await putData(`api/clickup/list/${idList}`, values);
+              } else {
+                await postData("api/clickup/list", values);
               }
-              formComponent={
-                <ListForm
-                  isSubmitting={isSubmitting}
-                  idSpacing={idSpacing}
-                  setNameSpacing={setNameSpacing}
-                />
-              }
-              hcolor={"#1d2e3d"}
-              height={"380px"}
-            />
-          </Grid>
-        </Grid>
+              setOpenDialog(false);
+              setShowAlert(true);
+            } catch (error) {
+              console.error(error);
+            } finally {
+              actions.setSubmitting(false);
+            }
+          }}
+          enableReinitialize={true}
+        >
+          {({ isSubmitting, handleSubmit }) => (
+            <>
+              <ListForm idSpacing={idSpacing} setNameSpacing={setNameSpacing} />
+              <DialogActions
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  marginTop: "16px",
+                }}
+              >
+                <Button
+                  type="button"
+                  variant="contained"
+                  disabled={isSubmitting}
+                  onClick={handleSubmit}
+                  startIcon={
+                    isSubmitting ? <CircularProgress size={24} /> : <SaveIcon />
+                  }
+                  sx={{
+                    backgroundColor: "#0dac3a",
+                    "&:hover": {
+                      backgroundColor: "#075f20",
+                    },
+                  }}
+                >
+                  {isSubmitting ? "Guardando..." : "Guardar Espacio"}
+                </Button>
+              </DialogActions>
+            </>
+          )}
+        </FormInit>
       )}
-    </FormInit>
+    </CreateDialog>
   );
 };
 
 AddList.propTypes = {
+  openDialog: PropTypes.bool,
   setOpenDialog: PropTypes.func,
   setShowAlert: PropTypes.func,
   context: PropTypes.string,

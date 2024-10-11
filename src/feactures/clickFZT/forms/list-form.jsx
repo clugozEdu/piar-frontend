@@ -1,8 +1,5 @@
 import { useEffect, useCallback, useState } from "react";
-import { Box, Button, CircularProgress } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import { useFormikContext } from "formik";
-import SaveIcon from "@mui/icons-material/Save";
 import { Person } from "@mui/icons-material";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
@@ -15,9 +12,8 @@ import AutoCompleteFormField from "@/common/components/shares/AutoCompleteField"
  * @param {string} idSpacing - Id of the spacing
  * @param {function} setNameSpacing - Function to set the name of the spacing
  */
-const ListForm = ({ isSubmitting, idSpacing, setNameSpacing }) => {
+const ListForm = ({ idSpacing, setNameSpacing }) => {
   /** Init state the component */
-  const { handleSubmit } = useFormikContext();
   const { advisor } = useSelector((state) => state.loginAdvisor);
   const [advisorsSpacing, setAdvisorSpacing] = useState([]);
 
@@ -37,13 +33,6 @@ const ListForm = ({ isSubmitting, idSpacing, setNameSpacing }) => {
       fetchSpacing();
     }
   }, [idSpacing, fetchSpacing]);
-
-  /** Function to handle the submit of the form
-   * @param {function} handleSubmit - Function to submit the form in the context of Formik
-   */
-  const handleForSubmit = () => {
-    handleSubmit();
-  };
 
   /** Filter the advisor login from the list of advisors
    */
@@ -85,7 +74,7 @@ const ListForm = ({ isSubmitting, idSpacing, setNameSpacing }) => {
     <Grid container spacing={2} id="grid-container-spacing-form">
       {renderTextFormField(
         "title",
-        "Nombre de la Lista",
+        "P. ej. Visitas a Escuelas, Tareas Oficina, etc.",
         "Nombre de la Lista",
         true,
         12,
@@ -119,7 +108,7 @@ const ListForm = ({ isSubmitting, idSpacing, setNameSpacing }) => {
        */}
       <AutoCompleteFormField
         name="advisor_ids"
-        label="Asesores en el espacio"
+        label={`Compartir con asesores del espacio (${filteredAdvisors.length})`}
         placeholder="Asesores de la Lista"
         options={filteredAdvisors}
         getOptionLabel={(option) => `${option.first_name} ${option.last_name}`}
@@ -130,31 +119,6 @@ const ListForm = ({ isSubmitting, idSpacing, setNameSpacing }) => {
         lg={12}
         icon={<Person />}
       />
-
-      {/** Component Box
-       * Add Spacing between the button and the form
-       */}
-      <Box sx={{ flex: "1 1 auto" }} />
-
-      {/** Component Button
-       * Button to submit the form with the dataq
-       */}
-      <Button
-        type="button"
-        variant="contained"
-        disabled={isSubmitting}
-        onClick={handleForSubmit}
-        startIcon={isSubmitting ? <CircularProgress size={24} /> : <SaveIcon />}
-        sx={{
-          backgroundColor: "#0dac3a",
-          "&:hover": {
-            backgroundColor: "#075f20",
-          },
-        }}
-      >
-        {/** Change text in the button */}
-        {isSubmitting ? "Guardando..." : "Guardar Lista"}
-      </Button>
     </Grid>
   );
 };
@@ -165,8 +129,7 @@ const ListForm = ({ isSubmitting, idSpacing, setNameSpacing }) => {
  * @param {function} setNameSpacing - Function to set the name of the spacing
  */
 ListForm.propTypes = {
-  isSubmitting: PropTypes.bool.isRequired,
-  idSpacing: PropTypes.string,
+  idSpacing: PropTypes.string.isRequired,
   setNameSpacing: PropTypes.func,
 };
 

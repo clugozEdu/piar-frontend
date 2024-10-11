@@ -1,27 +1,18 @@
-import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import store from "@/redux/store";
 import { logout } from "@/feactures/auth/redux/login-slice";
-import PropTypes from "prop-types";
 
 /** Component to token authenticated validate in Api request
  * @param {object} error - Error object
  */
-const TokenRefresh = ({ error }) => {
-  const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (error && error.response && error.response.status === 401) {
-      console.log("Token expired");
-      dispatch(logout());
-    }
-  }, [error, dispatch]);
+const tokenRefresh = (error) => {
+  if (error.status === 401 && error.response.statusText === "Unauthorized") {
+    localStorage.removeItem("token-advisor");
+    localStorage.removeItem("is_authenticated");
+    localStorage.removeItem("advisor");
+
+    store.dispatch(logout());
+  }
 };
 
-/** PropTypes
- * @param {object} error - Error object
- */
-TokenRefresh.propTypes = {
-  error: PropTypes.object,
-};
-
-export default TokenRefresh;
+export default tokenRefresh;

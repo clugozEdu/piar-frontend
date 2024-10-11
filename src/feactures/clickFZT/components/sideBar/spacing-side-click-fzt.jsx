@@ -124,13 +124,14 @@ const SpacingsList = ({
                 component={Link}
                 to={`clickFZT/spacing/${spacing.id}`}
                 sx={{
-                  padding: 0,
+                  padding: 0.5,
+                  // padding: 0,
                   mb: open[spacing.id] ? 0 : 1,
                   borderRadius: open[spacing.id] ? "5px 5px 0 0" : 5,
                   "&:hover": {
                     backgroundColor: "transparent",
                   },
-                  boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.1)",
+                  // boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.1)",
                 }}
                 onClick={(e) => {
                   e.preventDefault();
@@ -173,14 +174,17 @@ const SpacingsList = ({
                 <List component="div" disablePadding>
                   {spacing?.lists?.map((list) => (
                     <ListItemButton
+                      id="list-item-button"
                       key={list.id}
                       component={Link}
                       to={`clickFZT/spacings/${spacing.id}/list/${list.id}`}
                       sx={{
-                        padding: 0,
                         mt: 1,
                         mb: 1,
-                        borderRadius: 5,
+                        p: "0px 10px 0px 0px",
+                        "&:hover": {
+                          backgroundColor: "transparent",
+                        },
                       }}
                     >
                       <ListIcon sx={{ fill: "#0084cb" }} />
@@ -188,27 +192,36 @@ const SpacingsList = ({
                       <ListItemText sx={{ pl: 1 }} primary={list.title} />
                       {/* Botón eliminar si es dueño */}
                       {list.isOwner || spacing.isOwner ? (
-                        <Box display={"flex"}>
-                          <Tooltip title={"Editar Lista"}>
-                            <IconButton
-                              edge="end"
-                              onClick={(e) =>
-                                handleEditList(e, list.id, spacing.id)
-                              }
-                            >
-                              <EditIcon sx={{ fill: "#0084cb" }} />
-                            </IconButton>
-                          </Tooltip>
-
-                          <Tooltip title={"Eliminar Lista"}>
-                            <IconButton
-                              edge="end"
-                              onClick={(e) => handleDeleteList(e, list.id)}
-                            >
-                              <Delete sx={{ fill: "#0084cb" }} />
-                            </IconButton>
-                          </Tooltip>
-                        </Box>
+                        <>
+                          <Box
+                            id="box-edit-list"
+                            display={"flex"}
+                            sx={{
+                              margin: "0px 10px 0px 0px",
+                            }}
+                          >
+                            <Tooltip title={"Editar Lista"}>
+                              <IconButton
+                                edge="end"
+                                onClick={(e) =>
+                                  handleEditList(e, list.id, spacing.id)
+                                }
+                              >
+                                <EditIcon sx={{ fill: "#0084cb" }} />
+                              </IconButton>
+                            </Tooltip>
+                          </Box>
+                          <Box display={"flex"}>
+                            <Tooltip title={"Eliminar Lista"}>
+                              <IconButton
+                                edge="end"
+                                onClick={(e) => handleDeleteList(e, list.id)}
+                              >
+                                <Delete sx={{ fill: "#0084cb" }} />
+                              </IconButton>
+                            </Tooltip>
+                          </Box>
+                        </>
                       ) : null}
                     </ListItemButton>
                   ))}

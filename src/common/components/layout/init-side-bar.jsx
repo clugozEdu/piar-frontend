@@ -10,8 +10,7 @@ import Title from "../ui/title";
  * @param {string} selectedMenu - Id of the selected menu
  */
 
-const InitSideBar = ({ listData, userLogin, selectedMenu }) => {
-  console.log(listData);
+const InitSideBar = ({ userLogin, selectedMenu }) => {
   /** Init state the component */
   const [contextMenu, setContextMenu] = useState(selectedMenu);
 
@@ -146,7 +145,7 @@ const InitSideBar = ({ listData, userLogin, selectedMenu }) => {
  * loadingGlobal: Function to set the loading global
  */
 InitSideBar.propTypes = {
-  listData: PropTypes.array.isRequired,
+  // listData: PropTypes.array.isRequired,
   userLogin: PropTypes.object.isRequired,
   selectedMenu: PropTypes.string,
 };

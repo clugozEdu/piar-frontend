@@ -1,71 +1,66 @@
 import {
   Dialog,
   DialogContent,
-  DialogActions,
-  Button,
-  CircularProgress,
   DialogTitle,
+  IconButton,
+  Box,
 } from "@mui/material";
-import SaveIcon from "@mui/icons-material/Save";
+import CloseIcon from "@mui/icons-material/Close";
+import LoadingGLobal from "@/common/components/ui/loading-global";
 import PropTypes from "prop-types";
 
-/** Dialog component
- * @param {boolean} open - Dialog open state
- * @param {function} onClose - Function to close the dialog
- * @param {JSX.Element} children - Child component to render
- */
-const CreateDialog = ({
-  open,
-  onClose,
-  children,
-  isSubmitting,
-  handleSubmit,
-  title,
-}) => {
-  const handleForSubmit = () => {
-    handleSubmit();
+const CreateDialog = ({ open, onClose, children, title, isLoading }) => {
+  const handleClose = () => {
+    onClose(false);
+  };
+
+  /** Set a fixed or minimum height */
+  const dialogContentStyle = {
+    minHeight: "200px", // Adjust this value as needed
+    display: "flex",
+    flexDirection: "column",
   };
 
   return (
-    <Dialog open={open} onClose={() => onClose(false)} maxWidth="sm">
-      <DialogTitle>{title}</DialogTitle>
-      <DialogContent>{children}</DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Cancelar</Button>
-        <Button
-          type="button"
-          variant="contained"
-          disabled={isSubmitting}
-          onClick={handleForSubmit}
-          startIcon={
-            isSubmitting ? <CircularProgress size={24} /> : <SaveIcon />
-          }
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+      <DialogTitle id="title-dialog">{title}</DialogTitle>
+      {isLoading && <LoadingGLobal />}
+
+      <IconButton
+        aria-label="close"
+        onClick={handleClose}
+        sx={(theme) => ({
+          position: "absolute",
+          right: 8,
+          top: 8,
+          color: theme.palette.grey[500],
+        })}
+      >
+        <CloseIcon />
+      </IconButton>
+
+      <DialogContent dividers sx={dialogContentStyle}>
+        <Box
           sx={{
-            backgroundColor: "#0dac3a",
-            "&:hover": {
-              backgroundColor: "#075f20",
-            },
+            flexGrow: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          {isSubmitting ? "Guardando..." : "Guardar Espacio"}
-        </Button>
-      </DialogActions>
+          {children}
+        </Box>
+      </DialogContent>
     </Dialog>
   );
 };
 
-/** PropTypes
- * @property {boolean} open - Dialog open state
- * @property {function} onClose - Function to close the dialog
- * @property {JSX.Element} children - Child component to render
- */
 CreateDialog.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   children: PropTypes.node,
-  isSubmitting: PropTypes.bool,
-  handleSubmit: PropTypes.func,
-  title: PropTypes.string,
+  title: PropTypes.node,
+  isLoading: PropTypes.bool,
 };
 
 export default CreateDialog;

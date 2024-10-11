@@ -1,5 +1,5 @@
 import axios from "axios";
-import TokenRefresh from "@/common/hooks/use-token-refresh";
+import tokenRefresh from "@/common/hooks/use-token-refresh";
 
 const BASE_URL = "http://192.168.1.197/";
 
@@ -31,8 +31,8 @@ const createHeaders = (isJson = true) => {
  * @param {object} error - Object with the error data
  */
 const handleError = (error) => {
-  if (error.response && error.response.data) {
-    TokenRefresh(error.response.data);
+  if (error) {
+    tokenRefresh(error);
   } else {
     console.error("Error general:", error.message || "Error desconocido");
   }
