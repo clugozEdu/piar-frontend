@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Grid from "@mui/material/Grid2";
 import * as Yup from "yup";
-import { getData, postData } from "@/services/api";
+import { getData, postData, putData } from "@/services/api";
 import PropTypes from "prop-types";
 import FormInit from "@/common/components/form/form-init";
 import CardsForms from "@/common/components/ui/cards";
@@ -57,7 +57,9 @@ const AddList = ({
       validationSchema={validateSchemaList}
       onSubmit={async (values) => {
         console.log(values);
-        await postData("api/clickup/list", values);
+        context == "editList"
+          ? await putData(`api/clickup/list/${idList}`, values)
+          : await postData("api/clickup/list", values);
         setOpenDialog(false);
         setShowAlert(true);
       }}

@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { List, Toolbar } from "@mui/material";
+import { Box, List } from "@mui/material";
 import PropTypes from "prop-types";
-import ListSideClickFZT from "@/feactures/clickFZT/components/list-side-click-fzt";
+import ListSideClickFZT from "@/feactures/clickFZT/components/sideBar/list-side-click-fzt";
+import Title from "../ui/title";
 
 /** Component to render to menu from menu selected
  * @param {array} listData - Array of objects with the list data
@@ -101,18 +102,28 @@ const InitSideBar = ({ listData, userLogin, selectedMenu }) => {
 
   return (
     <>
-      {/** Toolbar to set logo */}
-      <Toolbar
-        sx={{
-          alignItems: "center",
-          justifyContent: "center",
-        }}
+      {/** Title */}
+      <Box
+        display="flex"
+        pl={1}
+        justifyContent="flex-start"
+        alignItems="end"
+        id="box-title-side-bar"
+        gap={1}
       >
         {/** Logo */}
-        <img src="/public/logo.png" alt="Logo" style={{ height: "70px" }} />
-      </Toolbar>
+        <img src="/public/logo.png" alt="Logo" height="40px" />
+
+        {/** Título */}
+        <Title
+          sx={{
+            pl: 1,
+          }}
+          text="Click FZT"
+        />
+      </Box>
       {/** List of menu options */}
-      <List sx={{ padding: 0, mt: 1 }}>
+      <List sx={{ padding: 1 }} id="list-side-bar-init">
         {/** Render the menu items to clickFZT */}
         {contextMenu === "clickFZT" ? (
           /** Component ListSideCickFZT

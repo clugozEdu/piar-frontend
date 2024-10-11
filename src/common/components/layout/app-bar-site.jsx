@@ -41,7 +41,7 @@ const AppBarSite = ({ advisor }) => {
         sx={{
           display: "flex",
           height: "98vh",
-          margin: 1,
+          margin: "1px 1px",
           alignContent: "center",
         }}
       >
@@ -79,8 +79,8 @@ const AppBarSite = ({ advisor }) => {
             flexDirection: "column",
             width: "100%",
             maxWidth: 280,
-            minWidth: 250,
-            padding: 2,
+            minWidth: 300,
+            padding: "5px 10px 15px 15px",
           }}
         >
           {/** Component List Side Bar to all Icons Menu

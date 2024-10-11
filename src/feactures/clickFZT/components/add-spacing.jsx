@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
-import Grid from "@mui/material/Grid2";
+// import Grid from "@mui/material/Grid2";
 import * as Yup from "yup";
 import PropTypes from "prop-types";
 import FormInit from "@/common/components/form/form-init";
-import CardsForms from "@/common/components/ui/cards";
+// import CardsForms from "@/common/components/ui/cards";
+import CreateDialog from "./create-dialog";
 import SpacingForm from "../forms/spacing-form";
 import { postData, getData, putData } from "@/services/api";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Typography } from "@mui/material";
 
 /** Component AddSpacing
  * Initial form to create or edit a spacing using Formik and Yup
@@ -16,8 +17,13 @@ import { CircularProgress } from "@mui/material";
  * @returns {JSX.Element} - FormInit component
  */
 
-const AddSpacing = ({ setOpenDialog, setShowAlert, context, idSpacing }) => {
-  // console.log(idSpacing);
+const AddSpacing = ({
+  openDialog,
+  setOpenDialog,
+  setShowAlert,
+  context,
+  idSpacing,
+}) => {
   /** Init state the component */
   const [initValues, setInitValues] = useState({
     title: "",
@@ -76,6 +82,7 @@ const AddSpacing = ({ setOpenDialog, setShowAlert, context, idSpacing }) => {
       initialValues={initValues}
       validationSchema={validateShemaSpacing}
       onSubmit={async (values) => {
+        console.log(values);
         context === "editSpacing"
           ? await putData(`api/clickup/spacing/${idSpacing}`, values)
           : await postData("api/clickup/spacing/", values);
@@ -87,34 +94,32 @@ const AddSpacing = ({ setOpenDialog, setShowAlert, context, idSpacing }) => {
       {/** Render child pass at component
        * Get Props values, errors and isSubmitting
        */}
-      {({ isSubmitting }) => (
-        <Grid container spacing={2} id="spacing-init-form-grid">
-          <Grid size={12} id="spacing-init-form">
-            {/** Component CardsForms
-             * Render the form of the spacing
-             * @param {string} title - Title of the card
-             * @param {JSX.Element} formComponent - Component to render
-             * @param {string} hcolor - Color of the card
-             * @param {string} height - Height of the card
-             */}
-            <CardsForms
-              title={
-                context === "createSpacing"
-                  ? "Creando Espacio"
-                  : "Editando Espacio"
-              }
-              formComponent={
-                /** Component SpacingForm
-                 * Render the form of the spacing
-                 * @param {boolean} isSubmitting - Submitting status
-                 */
-                <SpacingForm isSubmitting={isSubmitting} />
-              }
-              hcolor={"#1d2e3d"}
-              height={"400px"}
-            />
-          </Grid>
-        </Grid>
+      {({ isSubmitting, handleSubmit }) => (
+        <CreateDialog
+          title={
+            context === "createSpacing" ? (
+              <>
+                <Typography variant="h6" sx={{ flexGrow: 1 }}>
+                  Creando Espacio
+                </Typography>
+                <Typography variant="body2" sx={{ flexGrow: 1 }}>
+                  Un espacio representa a los equipos, departamentos o grupos,
+                  cada uno con sus propias listas, flujos de trabajo y ajustes.
+                </Typography>
+              </>
+            ) : (
+              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                Editando Espacio
+              </Typography>
+            )
+          }
+          open={openDialog}
+          onClose={setOpenDialog}
+          isSubmitting={isSubmitting}
+          handleSubmit={handleSubmit}
+        >
+          <SpacingForm />
+        </CreateDialog>
       )}
     </FormInit>
   );
@@ -126,6 +131,7 @@ const AddSpacing = ({ setOpenDialog, setShowAlert, context, idSpacing }) => {
  * @param {string} context - Context to create or edit a spacing
  */
 AddSpacing.propTypes = {
+  openDialog: PropTypes.bool.isRequired,
   setOpenDialog: PropTypes.func.isRequired,
   setShowAlert: PropTypes.func,
   context: PropTypes.string,

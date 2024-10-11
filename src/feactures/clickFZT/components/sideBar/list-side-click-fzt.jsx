@@ -3,32 +3,24 @@ import {
   List,
   ListItemText,
   ListItemButton,
-  Collapse,
-  IconButton,
   Box,
   Menu,
   MenuItem,
+  Typography,
+  Divider,
 } from "@mui/material";
-import {
-  ExpandLess,
-  ExpandMore,
-  Folder,
-  FolderOpen,
-  CreateNewFolder,
-  Home,
-  MoreVert,
-  Add,
-  Delete,
-} from "@mui/icons-material";
-import ListIcon from "@mui/icons-material/List";
+import { CreateNewFolder, Home, Add, Delete } from "@mui/icons-material";
+import FolderSpecialIcon from "@mui/icons-material/FolderSpecial";
+import FolderSharedIcon from "@mui/icons-material/FolderShared";
 import EditIcon from "@mui/icons-material/Edit";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import { getData } from "@/services/api";
-import CreateDialog from "./create-dialog";
-import AddSpacing from "./add-spacing";
-import AddList from "./add-lists";
-import ConfirmDeleteItems from "./delete-items";
+import CreateDialog from "../create-dialog";
+import AddSpacing from "../add-spacing";
+import AddList from "../add-lists";
+import ConfirmDeleteItems from "../delete-items";
+import SpacingsList from "./render-spacing-items";
 import SnackbarMessage from "@/common/components/ui/snackbar";
 import useWebSocket from "@/common/hooks/web-socket";
 import useLoading from "@/common/hooks/calllbacks/loading";
@@ -93,6 +85,8 @@ const ListSideClickFZT = ({ advisorLogin }) => {
     }, 2000);
   }, [fetchSpacings, setIsLoading]);
 
+  console.log(spacings);
+
   /** UseEffect to read message to webSocket
    * @param {object} message - [Object] with the message from webSocket
    * event: event to create spacing
@@ -129,12 +123,13 @@ const ListSideClickFZT = ({ advisorLogin }) => {
 
   /** Handle to when click and open Menu
    * useCallback: hook to save in cache the function
-   * @param {object} event - Event to prevent default
+   * @param {object} event - Event to prevent default and stop propagation
    * @param {string} spacingId - Id of the spacing
    * @returns {object} anchorEl - Object with the anchorEl
    * @returns {string} selectedSpacing - Id of the selected spacing
    */
   const handleMenuClick = useCallback((event, spacingId) => {
+    event.stopPropagation();
     event.preventDefault();
     setSelectedSpacing(spacingId);
     setAnchorEl(event.currentTarget);
@@ -217,6 +212,7 @@ const ListSideClickFZT = ({ advisorLogin }) => {
            * @param {string} context - context to spacing edit or create
            */
           <AddSpacing
+            openDialog={isDialogOpen}
             setOpenDialog={setIsDialogOpen}
             setShowAlert={setShowAlert}
             context={contextDialog}
@@ -239,10 +235,17 @@ const ListSideClickFZT = ({ advisorLogin }) => {
   };
 
   return (
-    <Box>
-      <List>
+    <Box id="box-side-click-fzt">
+      <List id="list-side-click-fzt">
         {/** Render home button */}
-        <ListItemButton component={Link} to="/clickFZT/inicio">
+        <ListItemButton
+          component={Link}
+          to="/clickFZT/inicio"
+          sx={{
+            padding: 0,
+            borderRadius: 5,
+          }}
+        >
           <Home
             sx={{
               fill: "#0084cb",
@@ -250,9 +253,14 @@ const ListSideClickFZT = ({ advisorLogin }) => {
           />
           <ListItemText sx={{ pl: 1 }} primary="Inicio" />
         </ListItemButton>
-
         {/* Render create spacing button */}
-        <ListItemButton onClick={handleCreateSpacing}>
+        <ListItemButton
+          onClick={handleCreateSpacing}
+          sx={{
+            padding: 0,
+            borderRadius: 5,
+          }}
+        >
           <CreateNewFolder
             sx={{
               fill: "#0084cb",
@@ -261,11 +269,44 @@ const ListSideClickFZT = ({ advisorLogin }) => {
           <ListItemText sx={{ pl: 1 }} primary="Crear Espacio" />
         </ListItemButton>
 
-        {/* <Divider
+        <Divider
           sx={{
-            backgroundColor: "#0084cb",
+            m: 1,
           }}
-        /> */}
+        />
+
+        {/* Render title Mis Espacios */}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "start",
+            alignItems: "center",
+          }}
+        >
+          <FolderSpecialIcon
+            sx={{
+              fill: "#c9b202",
+            }}
+          />
+          <Typography
+            variant="body2"
+            sx={{
+              mt: 0,
+              ml: 1,
+              mb: 0,
+              mr: 1,
+              fontSize: "0.7rem",
+            }}
+          >
+            Mis Espacios
+          </Typography>
+        </Box>
+
+        <Divider
+          sx={{
+            m: 1,
+          }}
+        />
 
         {/* Component SpacingsList
          * @param {array} spacings - Array with the spacings
@@ -279,6 +320,52 @@ const ListSideClickFZT = ({ advisorLogin }) => {
           open={open}
           handleClick={handleClick}
           handleMenuClick={handleMenuClick}
+          context={"owner"}
+        />
+
+        <Divider
+          sx={{
+            m: 1,
+          }}
+        />
+        {/* Render Espacios Compartidos */}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "start",
+            alignItems: "center",
+          }}
+        >
+          <FolderSharedIcon
+            sx={{
+              fill: "#c9b202",
+            }}
+          />
+          <Typography
+            variant="body2"
+            sx={{
+              mt: 0,
+              ml: 1,
+              mb: 0,
+              mr: 1,
+              fontSize: "0.7rem",
+            }}
+          >
+            Espacios Compartidos
+          </Typography>
+        </Box>
+        <Divider
+          sx={{
+            m: 1,
+          }}
+        />
+
+        <SpacingsList
+          spacings={spacings}
+          open={open}
+          handleClick={handleClick}
+          handleMenuClick={handleMenuClick}
+          context={"shared"}
         />
       </List>
 
@@ -297,15 +384,18 @@ const ListSideClickFZT = ({ advisorLogin }) => {
           flexDirection={"column"}
           justifyContent={"space-between"}
         >
-          {/* Render menu edit spacing */}
-          <MenuItem onClick={handleEditSpacing}>
-            <EditIcon
-              sx={{
-                mr: 2,
-              }}
-            />
-            Editar Espacio
-          </MenuItem>
+          {/* Render menu edit spacing only if owner */}
+          {selectedSpacing &&
+            spacings.find((s) => s.id === selectedSpacing)?.isOwner && (
+              <MenuItem onClick={handleEditSpacing}>
+                <EditIcon
+                  sx={{
+                    mr: 2,
+                  }}
+                />
+                Editar Espacio
+              </MenuItem>
+            )}
           {/* Render menu add list */}
           <MenuItem onClick={handleCreateList}>
             <Add
@@ -338,6 +428,8 @@ const ListSideClickFZT = ({ advisorLogin }) => {
       {/* Render delete confirmation */}
       {isDeleteConfirmOpen && selectedSpacing && (
         <ConfirmDeleteItems
+          pathGet={`api/clickup/spacing/${selectedSpacing}`}
+          pathDelete={`api/clickup/spacing/${selectedSpacing}`}
           idElement={selectedSpacing}
           onClose={handleMenuClose}
           handleOpen={setIsDeleteConfirmOpen}
@@ -361,156 +453,6 @@ const ListSideClickFZT = ({ advisorLogin }) => {
       )}
     </Box>
   );
-};
-
-/** Component SpacingList
- * Render the list of spacings and lists for the advisor
- * @param {array} spacings - Array with the spacings
- * @param {object} open - Object with the spacings open
- * @param {func} handleClick - Function to open and close item list
- * @param {func} handleMenuClick - Function to open menu
- * @param {boolean} isResponsible - Boolean to check if the advisor is responsible
- */
-const SpacingsList = ({
-  spacings,
-  open,
-  handleClick,
-  handleMenuClick,
-  // isResponsible,
-}) => {
-  console.log(spacings);
-  return (
-    <div>
-      {spacings.map((spacing) => (
-        <div
-          key={spacing.id}
-          style={{
-            margin: 3,
-          }}
-        >
-          {/* Render Items */}
-          <ListItemButton
-            component={Link}
-            to={`clickFZT/spacing/${spacing.id}`}
-            sx={{
-              // backgroundColor: "#0269a4",
-              mb: 1,
-              // borderLeft: "3px solid #0084cb",
-              boxShadow: 1,
-              borderRadius: 5,
-              "&:hover": {
-                backgroundColor: "f0f0f0",
-              },
-            }}
-          >
-            {/* Render change the Folder Icon */}
-            {open[spacing.id] ? (
-              <FolderOpen
-                sx={{
-                  fill: "#578e22",
-                }}
-              />
-            ) : (
-              <Folder
-                sx={{
-                  fill: "#578e22",
-                }}
-              />
-            )}
-
-            {/* Name Spacing */}
-            <ListItemText primary={spacing.title} sx={{ pl: 1 }} />
-
-            {/* Render the ExpandLess or ExpandMore Icon */}
-            <IconButton
-              onClick={(e) => {
-                e.stopPropagation();
-                handleClick(e, spacing.id);
-              }}
-            >
-              {open[spacing.id] ? (
-                <ExpandLess
-                  sx={{
-                    fill: "#578e22",
-                  }}
-                />
-              ) : (
-                <ExpandMore
-                  sx={{
-                    fill: "#578e22",
-                  }}
-                />
-              )}
-            </IconButton>
-
-            {/* Render the MoreVert Icon */}
-            <IconButton
-              edge="end"
-              onClick={(e) => handleMenuClick(e, spacing.id)}
-            >
-              <MoreVert
-                sx={{
-                  fill: "#000",
-                }}
-              />
-            </IconButton>
-          </ListItemButton>
-
-          {/* Collapse content list */}
-          <Collapse in={open[spacing.id]} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding>
-              {spacing?.lists?.map((list) => (
-                /* Render the lists of spacing */
-                <ListItemButton
-                  key={list.id}
-                  component={Link}
-                  to={`clickFZT/spacings/${spacing.id}/list/${list.id}`}
-                  sx={{
-                    mb: 1,
-                    borderRadius: 5,
-                  }}
-                >
-                  <ListIcon
-                    sx={{
-                      fill: "#000",
-                    }}
-                  />
-
-                  {/* Render the List Text */}
-                  <ListItemText sx={{ pl: 1 }} primary={list.title} />
-
-                  {/* Render the Delete Icon only is owner list */}
-                  {list.isOwner && (
-                    <IconButton edge="end">
-                      <Delete
-                        sx={{
-                          fill: "#000",
-                        }}
-                      />
-                    </IconButton>
-                  )}
-                </ListItemButton>
-              ))}
-            </List>
-          </Collapse>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-/** PropTypes SpacingsList
- * @param {array} spacings - Array with the spacings
- * @param {object} open - Object with the spacings open
- * @param {func} handleClick - Function to open and close item list
- * @param {func} handleMenuClick - Function to open menu
- * @param {boolean} isResponsible - Boolean to check if the advisor is responsible
- */
-SpacingsList.propTypes = {
-  spacings: PropTypes.array.isRequired,
-  open: PropTypes.object.isRequired,
-  handleClick: PropTypes.func.isRequired,
-  handleMenuClick: PropTypes.func.isRequired,
 };
 
 /** PropTypes ListSideClickFZT
