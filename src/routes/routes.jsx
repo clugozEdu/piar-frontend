@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import SingIn from "../feactures/auth/forms/login.jsx";
 import HomePage from "../feactures/home/home.jsx";
+import TaskPage from "@/feactures/clickFZT/task/task-page.jsx";
 import ProtectRouter from "./protect-router.jsx";
 // import TravelInit from "../feactures/travel/travel-init.jsx";
 import ErrorPage from "./error-page.jsx";
@@ -55,7 +56,7 @@ const router = createBrowserRouter([
           },
           {
             path: "clickFZT/spacing/:spacingId/list/:listId",
-            element: <HomePage />,
+            element: <TaskPage />,
           },
           {
             path: "schools",

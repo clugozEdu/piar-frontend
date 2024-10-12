@@ -16,7 +16,7 @@ const CreateDialog = ({ open, onClose, children, title, isLoading }) => {
 
   /** Set a fixed or minimum height */
   const dialogContentStyle = {
-    minHeight: "200px", // Adjust this value as needed
+    minHeight: "300px", // Adjust this value as needed
     display: "flex",
     flexDirection: "column",
   };

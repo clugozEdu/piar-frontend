@@ -114,11 +114,12 @@ const AppBarSite = ({ advisor }) => {
         >
           {/** Box to Account Menu */}
           <Box
+            id="box-header-main"
             sx={{
               display: "flex",
               alignItems: "center",
               justifyContent: "end",
-              p: 1,
+              padding: "0px 0px 0px 0px",
             }}
           >
             {/* <NavLinksBreadcrumbs /> */}
@@ -129,7 +130,10 @@ const AppBarSite = ({ advisor }) => {
           </Box>
 
           {/** Box to Outlet of the App */}
-          <Box sx={{ flexGrow: 1, p: 1 }}>
+          <Box
+            sx={{ flexGrow: 1, padding: "0px 10px 0px 10px" }}
+            id="box-oulet"
+          >
             {/** Component Outlet
              * Render the component of the selected menu
              */}

@@ -21,18 +21,9 @@ import EditIcon from "@mui/icons-material/Edit";
 import ListIcon from "@mui/icons-material/List";
 import PropTypes from "prop-types";
 import ConfirmDeleteItems from "../delete-items";
-// import CreateDialog from "../create-dialog";
 import AddList from "../add-lists";
 import SnackbarMessage from "@/common/components/ui/snackbar";
 
-/** Component SpacingList
- * Render the list of spacings and lists for the advisor
- * @param {array} spacings - Array with the spacings
- * @param {object} open - Object with the spacings open
- * @param {func} handleClick - Function to open and close item list
- * @param {func} handleMenuClick - Function to open menu
- * @param {boolean} isResponsible - Boolean to check if the advisor is responsible
- */
 const SpacingsList = ({
   spacings,
   open,
@@ -104,7 +95,7 @@ const SpacingsList = ({
         />
       )}
 
-      {/* Filtrar según el contexto (owner o shared) */}
+      {/* Filter according to context (owner or shared) */}
       {spacings.map(
         (spacing) =>
           ((context === "owner" && spacing.isOwner) ||
@@ -125,35 +116,42 @@ const SpacingsList = ({
                 to={`clickFZT/spacing/${spacing.id}`}
                 sx={{
                   padding: 0.5,
-                  // padding: 0,
                   mb: open[spacing.id] ? 0 : 1,
                   borderRadius: open[spacing.id] ? "5px 5px 0 0" : 5,
                   "&:hover": {
                     backgroundColor: "transparent",
                   },
-                  // boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.1)",
                 }}
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleClick(e, spacing.id);
-                }}
+                // Remove the onClick handler from ListItemButton
               >
-                {/* Icono de la carpeta */}
+                {/* Folder Icon */}
                 {open[spacing.id] ? (
                   <FolderOpen sx={{ fill: "#578e22" }} />
                 ) : (
                   <Folder sx={{ fill: "#578e22" }} />
                 )}
-                {/* Nombre del espacio */}
+                {/* Spacing Name */}
                 <ListItemText primary={spacing.title} sx={{ pl: 0.5 }} />
 
-                {/* Icono para expandir/cerrar */}
-                <IconButton>
+                {/* Expand/Collapse Icon */}
+                <IconButton
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation(); // Prevent navigation
+                    handleClick(e, spacing.id);
+                  }}
+                >
                   {open[spacing.id] ? <ExpandLess /> : <ExpandMore />}
                 </IconButton>
 
-                {/* Más opciones */}
-                <IconButton onClick={(e) => handleMenuClick(e, spacing.id)}>
+                {/* More Options */}
+                <IconButton
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation(); // Prevent navigation
+                    handleMenuClick(e, spacing.id);
+                  }}
+                >
                   <MoreVert />
                 </IconButton>
               </ListItemButton>
@@ -177,7 +175,7 @@ const SpacingsList = ({
                       id="list-item-button"
                       key={list.id}
                       component={Link}
-                      to={`clickFZT/spacings/${spacing.id}/list/${list.id}`}
+                      to={`clickFZT/spacing/${spacing.id}/list/${list.id}`}
                       sx={{
                         mt: 1,
                         mb: 1,
@@ -188,9 +186,9 @@ const SpacingsList = ({
                       }}
                     >
                       <ListIcon sx={{ fill: "#0084cb" }} />
-                      {/* Nombre de la lista */}
+                      {/* List Name */}
                       <ListItemText sx={{ pl: 1 }} primary={list.title} />
-                      {/* Botón eliminar si es dueño */}
+                      {/* Edit/Delete Buttons if owner */}
                       {list.isOwner || spacing.isOwner ? (
                         <>
                           <Box
@@ -203,9 +201,11 @@ const SpacingsList = ({
                             <Tooltip title={"Editar Lista"}>
                               <IconButton
                                 edge="end"
-                                onClick={(e) =>
-                                  handleEditList(e, list.id, spacing.id)
-                                }
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation(); // Prevent navigation
+                                  handleEditList(e, list.id, spacing.id);
+                                }}
                               >
                                 <EditIcon sx={{ fill: "#0084cb" }} />
                               </IconButton>
@@ -215,7 +215,11 @@ const SpacingsList = ({
                             <Tooltip title={"Eliminar Lista"}>
                               <IconButton
                                 edge="end"
-                                onClick={(e) => handleDeleteList(e, list.id)}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation(); // Prevent navigation
+                                  handleDeleteList(e, list.id);
+                                }}
                               >
                                 <Delete sx={{ fill: "#0084cb" }} />
                               </IconButton>
@@ -234,13 +238,6 @@ const SpacingsList = ({
   );
 };
 
-/** PropTypes SpacingsList
- * @param {array} spacings - Array with the spacings
- * @param {object} open - Object with the spacings open
- * @param {func} handleClick - Function to open and close item list
- * @param {func} handleMenuClick - Function to open menu
- * @param {boolean} isResponsible - Boolean to check if the advisor is responsible
- */
 SpacingsList.propTypes = {
   spacings: PropTypes.array.isRequired,
   open: PropTypes.object.isRequired,

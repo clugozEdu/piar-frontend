@@ -257,22 +257,6 @@ const ListSideClickFZT = ({ advisorLogin }) => {
           <ListItemText sx={{ pl: 1 }} primary="Inicio" />
         </ListItemButton>
 
-        {/* Render create spacing button
-        <ListItemButton
-          onClick={handleCreateSpacing}
-          sx={{
-            padding: 0,
-            borderRadius: 5,
-          }}
-        >
-          <CreateNewFolder
-            sx={{
-              fill: "#0084cb",
-            }}
-          />
-          <ListItemText sx={{ pl: 1 }} primary="Crear Espacio" />
-        </ListItemButton> */}
-
         {/* Render title Mis Espacios */}
         <Box
           sx={{
@@ -300,25 +284,15 @@ const ListSideClickFZT = ({ advisorLogin }) => {
             Mis Espacios
           </Typography>
 
-          <ListItemButton
-            sx={{
-              display: "flex",
-              justifyContent: "end",
-              padding: "0px 10px 0px 0px",
-              "&:hover": {
-                backgroundColor: "transparent",
-              },
-            }}
-            onClick={handleCreateSpacing}
-          >
-            <Tooltip title={"Crear Espacio"}>
-              <CreateNewFolder
-                sx={{
-                  fill: "#c9b202",
-                }}
-              />
-            </Tooltip>
-          </ListItemButton>
+          <Tooltip title={"Crear Espacio"}>
+            <CreateNewFolder
+              sx={{
+                fill: "#c9b202",
+                ml: "auto",
+              }}
+              onClick={handleCreateSpacing}
+            />
+          </Tooltip>
         </Box>
 
         <Divider
