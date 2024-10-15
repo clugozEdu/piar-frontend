@@ -30,31 +30,26 @@ export const stringAvatar = (name) => {
   };
 };
 
-export const priorityColors = {
-  Alta: "#cf940a",
-  Urgente: "#b13a41",
-  Media: "#4466ff",
-  Baja: "#87909e",
+export const isTaskOverdue = (dueDate, statusTask) => {
+  if (statusTask === "Done") {
+    return false;
+  }
+
+  const today = dayjs();
+  const due = dayjs(dueDate);
+  return today.isAfter(due, "day");
 };
 
-export const statusColors = {
-  Backlog: "#2f4a63", // Dark Slate Grey
-  Doing: "#0d1f2d", // Gold
-  Done: "#008844", // Dark Green
+export const groupedTask = (tasks) => {
+  return tasks.reduce((acc, task) => {
+    const status = task.status.name;
+    if (!acc[status]) {
+      acc[status] = [];
+    }
+    acc[status].push(task);
+    return acc;
+  }, {});
 };
-
-export const backStatusColor = {
-  Backlog: "#2f4a63", // Dark Slate Grey
-  Doing: "#0d1f2d", // Gold
-  Done: "#008844", // Dark Green
-};
-
-export const scrollBarColor = {
-  Backlog: "#2f4a63 #ffff",
-  Doing: "#0d1f2d #ffff",
-  Done: "#008844 #ffff",
-};
-
 export const getColorsScheme = (contextName, objectScheme) => {
   return objectScheme[contextName] || "default";
 };

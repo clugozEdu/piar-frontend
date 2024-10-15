@@ -42,8 +42,6 @@ const GeneralSectionTravel = () => {
     setFieldValue("idAdvisor", advisor.id);
   }, [advisor, setFieldValue]);
 
-  console.log("ejecutandose");
-
   // useEffect for filtering schools based on department
   useEffect(() => {
     if (values.department) {

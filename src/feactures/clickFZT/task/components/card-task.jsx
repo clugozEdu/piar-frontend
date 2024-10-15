@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -9,143 +10,180 @@ import {
   Divider,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
+import { useTheme } from "@emotion/react";
 import EventBusyIcon from "@mui/icons-material/EventBusy";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PropTypes from "prop-types";
-import {
-  statusColors,
-  getColorsScheme,
-  stringAvatar,
-} from "@/utilities/helpers";
+import { getColorsScheme, stringAvatar } from "@/utilities/helpers";
 import MenuCards from "@/common/components/clickFZT/menu-card-task";
 import PriorityChip from "@/common/components/clickFZT/priority-chip";
 import TitleMenu from "@/common/components/clickFZT/name-task";
 import TimeMenu from "@/common/components/clickFZT/time-menu";
 import DateMenuCard from "@/common/components/clickFZT/date-menu";
 import DescriptionMenuCard from "@/common/components/clickFZT/description-task";
-// import { handlerUpdateBD } from "../../../supabaseServices";
+import ConfirmDeleteItems from "../../components/delete-items";
 
 const TaskCard = ({ task, isOverdue }) => {
-  // set user name for tooltip
+  const [taskDelete, setTaskDelete] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
   const userName = `${task.owner_advisor.first_name} ${task.owner_advisor.last_name}`;
+  const theme = useTheme();
 
-  // handler delete Task
   const handlerDeleteTask = () => {
-    console.log("Delete task", task.id);
+    setTaskDelete(task.id);
+    setDeleteConfirm(true);
   };
 
   return (
-    <Card
-      variant="outlined"
-      sx={{
-        maxHeight: 400,
-        borderRadius: 5,
-        boxShadow: 2,
-        marginBottom: 2,
-      }}
-    >
-      <CardContent
+    <>
+      <Card
+        variant="outlined"
         sx={{
-          padding: "10px 10px 5px 5px",
+          maxHeight: 400,
+          borderRadius: 2,
+          // boxShadow: 2,
+          marginBottom: 2,
         }}
       >
-        <Grid container spacing={1}>
-          <Grid
-            xs={12}
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            {/* Name task*/}
-            <TitleMenu task={task} />
+        <CardContent>
+          <Grid container spacing={1}>
+            {/* Encabezado: Título y botones */}
+            <Grid
+              size={{ xs: 12 }}
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              {/* Nombre de la tarea */}
+              <TitleMenu task={task} />
 
-            {/* Buttons */}
-            <Box display="flex">
-              <IconButton onClick={handlerDeleteTask}>
-                <DeleteIcon />
-              </IconButton>
-              <MenuCards idStatus={task.status.id} taskId={task.id} />
-            </Box>
-          </Grid>
+              {/* Botones */}
+              <Box display="flex">
+                <IconButton
+                  sx={{
+                    padding: "0px 10px 0px 0px",
+                  }}
+                  onClick={handlerDeleteTask}
+                >
+                  <DeleteIcon />
+                </IconButton>
+                <MenuCards idStatus={task.status.id} taskId={task.id} />
+              </Box>
+            </Grid>
 
-          <Grid xs={12}>
-            <Divider />
-          </Grid>
+            <Grid size={{ xs: 12 }}>
+              <Divider />
+            </Grid>
 
-          {/* Description task */}
-          <Grid xs={12} sm={12} md={12} lg={12}>
-            <DescriptionMenuCard
-              description={task.description}
-              taskID={task.id}
-            />
-          </Grid>
-
-          {/* Date start task */}
-          <Grid xs={12} sm={12} md={12} lg={6}>
-            <DateMenuCard
-              date={task.start_date}
-              text={"Inicio: "}
-              taskID={task.id}
-              keyUpdate={"start_date"}
-            />
-          </Grid>
-          {/* Date end task */}
-          <Grid xs={12} sm={12} md={12} lg={6}>
-            <DateMenuCard
-              date={task.end_date}
-              text={"Fin: "}
-              taskID={task.id}
-              keyUpdate={"end_date"}
-            />
-          </Grid>
-
-          {/* Time task */}
-          <Grid xs={12}>
-            <TimeMenu task={task} />
-          </Grid>
-
-          <Grid xs={12} sm={12} display="flex" alignItems="center">
-            {/* Overdue task */}
-            {isOverdue && (
-              <Chip
-                label="Atrasada"
-                icon={<EventBusyIcon />}
-                sx={{
-                  backgroundColor: "transparent",
-                  // color: "white",
-                  mr: 1,
-                }}
+            {/* Descripción de la tarea */}
+            <Grid size={{ xs: 12, sm: 8 }}>
+              <DescriptionMenuCard
+                description={task.description}
+                taskID={task.id}
               />
-            )}
-            {/* Priority task */}
-            <PriorityChip priority={task.priority} idTask={task.id} />
-            {/* Status task */}
-            <Chip
-              label={task.status.name}
-              sx={{
-                backgroundColor: getColorsScheme(
-                  task.status.name,
-                  statusColors
-                ),
-                color: "white",
-                mr: 1,
-              }}
-            />
-            {/* User task */}
-            <Tooltip title={userName}>
-              <Avatar
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <Chip label={`En ${task.list_title}`} />
+            </Grid>
+
+            {/* Fechas de inicio y fin */}
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <DateMenuCard
+                date={task.start_date}
+                text={"Inicio: "}
+                taskID={task.id}
+                keyUpdate={"start_date"}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <DateMenuCard
+                date={task.end_date}
+                text={"Fin: "}
+                taskID={task.id}
+                keyUpdate={"end_date"}
+              />
+            </Grid>
+
+            {/* Tiempo dedicado a la tarea */}
+            <Grid size={{ xs: 12 }}>
+              <TimeMenu task={task} />
+            </Grid>
+
+            {/* Información de estado, prioridad y usuario */}
+            <Grid
+              size={{ xs: 12 }}
+              display="flex"
+              alignItems="center"
+              justifyContent={"flex-end"}
+              flexWrap="wrap"
+            >
+              {/* Prioridad */}
+              <PriorityChip priority={task.priority} idTask={task.id} />
+              {/* Tarea atrasada */}
+              {isOverdue && (
+                <Chip
+                  label="Atrasada"
+                  icon={
+                    <EventBusyIcon
+                      sx={{
+                        fill: "red",
+                      }}
+                    />
+                  }
+                  sx={{
+                    backgroundColor: "transparent",
+                  }}
+                />
+              )}
+              {/* Estado de la tarea */}
+              <Chip
+                label={task.status.name}
                 sx={{
-                  width: 32,
-                  height: 32,
+                  backgroundColor: getColorsScheme(
+                    task.status.name,
+                    theme.palette.statusTask
+                  ),
+                  color: "white",
                   marginRight: 1,
                 }}
-                {...stringAvatar(userName)}
               />
-            </Tooltip>
+
+              {/* Avatar del usuario */}
+              <Tooltip title={userName}>
+                <Avatar
+                  sx={{
+                    width: 32,
+                    height: 32,
+                    marginRight: 1,
+                  }}
+                  {...stringAvatar(userName)}
+                />
+              </Tooltip>
+
+              {/* Nombre de la lista */}
+              {/* <Chip
+                label={task.lists.title}
+                sx={{
+                  backgroundColor: "transparent",
+                  color: "black",
+                }}
+              /> */}
+            </Grid>
           </Grid>
-        </Grid>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+
+      {deleteConfirm && (
+        <ConfirmDeleteItems
+          idElement={taskDelete}
+          onClose={setDeleteConfirm}
+          handleOpen={setTaskDelete}
+          pathGet={`api/clickup/tasks/${taskDelete}`}
+          pathDelete={`api/clickup/tasks/${taskDelete}`}
+        />
+      )}
+    </>
   );
 };
 

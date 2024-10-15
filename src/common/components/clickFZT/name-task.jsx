@@ -87,7 +87,7 @@ const TitleMenu = ({ task }) => {
             // onClick={handleUpdateTitle}
             sx={{ mt: 2, borderRadius: 2 }}
           >
-            Actualizar Título
+            Actualizar
           </Button>
         </Box>
       </Menu>

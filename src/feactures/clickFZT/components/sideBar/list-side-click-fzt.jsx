@@ -10,6 +10,7 @@ import {
   Divider,
   Tooltip,
 } from "@mui/material";
+import { useTheme } from "@emotion/react";
 import { CreateNewFolder, Home, Add, Delete } from "@mui/icons-material";
 import FolderSpecialIcon from "@mui/icons-material/FolderSpecial";
 import FolderSharedIcon from "@mui/icons-material/FolderShared";
@@ -44,6 +45,7 @@ const ListSideClickFZT = ({ advisorLogin }) => {
   const { setIsLoading } = useLoading();
   const [showAlert, setShowAlert] = useState(false);
   const message = useWebSocket();
+  const theme = useTheme();
 
   /** Function to fetch spacing in api
    * useCallback: hook to save in cache the function
@@ -70,7 +72,6 @@ const ListSideClickFZT = ({ advisorLogin }) => {
       }));
 
       setSpacings(updatedSpacings);
-      setIsLoading(false);
     });
   }, [advisorLogin.id, setIsLoading]);
 
@@ -86,8 +87,6 @@ const ListSideClickFZT = ({ advisorLogin }) => {
     }, 2000);
   }, [fetchSpacings, setIsLoading]);
 
-  console.log(spacings);
-
   /** UseEffect to read message to webSocket
    * @param {object} message - [Object] with the message from webSocket
    * event: event to create spacing
@@ -95,7 +94,6 @@ const ListSideClickFZT = ({ advisorLogin }) => {
    * dependecies: message, fetchSpacings
    */
   useEffect(() => {
-    console.log(message);
     const event = message[0]?.event;
     if (event) {
       fetchSpacings();
@@ -251,7 +249,7 @@ const ListSideClickFZT = ({ advisorLogin }) => {
         >
           <Home
             sx={{
-              fill: "#0084cb",
+              fill: theme.palette.primary.main,
             }}
           />
           <ListItemText sx={{ pl: 1 }} primary="Inicio" />
@@ -268,17 +266,16 @@ const ListSideClickFZT = ({ advisorLogin }) => {
         >
           <FolderSpecialIcon
             sx={{
-              fill: "#c9b202",
+              fill: theme.palette.primary.main,
             }}
           />
           <Typography
-            variant="body2"
+            variant="body1"
             sx={{
               mt: 0,
               ml: 1,
               mb: 0,
               mr: 1,
-              fontSize: "1rem",
             }}
           >
             Mis Espacios
@@ -287,7 +284,7 @@ const ListSideClickFZT = ({ advisorLogin }) => {
           <Tooltip title={"Crear Espacio"}>
             <CreateNewFolder
               sx={{
-                fill: "#c9b202",
+                fill: theme.palette.primary.main,
                 ml: "auto",
               }}
               onClick={handleCreateSpacing}
@@ -298,6 +295,7 @@ const ListSideClickFZT = ({ advisorLogin }) => {
         <Divider
           sx={{
             m: 1,
+            // background: theme.palette.secondary.main,
           }}
         />
 
@@ -326,17 +324,15 @@ const ListSideClickFZT = ({ advisorLogin }) => {
         >
           <FolderSharedIcon
             sx={{
-              fill: "#c9b202",
+              fill: theme.palette.primary.main,
             }}
           />
           <Typography
-            variant="body2"
             sx={{
               mt: 0,
               ml: 1,
               mb: 0,
               mr: 1,
-              fontSize: "1rem",
             }}
           >
             Espacios Compartidos
@@ -346,6 +342,7 @@ const ListSideClickFZT = ({ advisorLogin }) => {
         <Divider
           sx={{
             m: 1,
+            // background: theme.palette.secondary.main,
           }}
         />
 
@@ -380,6 +377,7 @@ const ListSideClickFZT = ({ advisorLogin }) => {
                 <EditIcon
                   sx={{
                     mr: 2,
+                    fill: theme.palette.primary.secondary,
                   }}
                 />
                 Editar Espacio
@@ -390,6 +388,7 @@ const ListSideClickFZT = ({ advisorLogin }) => {
             <Add
               sx={{
                 mr: 2,
+                fill: theme.palette.primary.secondary,
               }}
             />
             Agregar Lista
@@ -401,6 +400,7 @@ const ListSideClickFZT = ({ advisorLogin }) => {
                 <Delete
                   sx={{
                     mr: 2,
+                    fill: theme.palette.primary.secondary,
                   }}
                 />
                 Eliminar Espacio
@@ -437,7 +437,7 @@ const ListSideClickFZT = ({ advisorLogin }) => {
           duration={3000}
           severity="success"
           vertical="bottom"
-          horizontal="left"
+          horizontal="right"
         />
       )}
     </Box>

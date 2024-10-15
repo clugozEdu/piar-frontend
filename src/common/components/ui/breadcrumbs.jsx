@@ -1,15 +1,18 @@
 import { useCallback, useEffect, useState } from "react";
+import { useTheme } from "@emotion/react";
 import { Breadcrumbs, Typography, Box } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import { FolderOpen, List } from "@mui/icons-material";
-import { useParams } from "react-router-dom";
+import { Folder, List, Home } from "@mui/icons-material";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { getData } from "@/services/api";
 
 const BreadCrumbsHeader = () => {
   const { listId, spacingId } = useParams();
+  const location = useLocation();
   const [nameList, setNameList] = useState("");
   const [nameSpacing, setNameSpacing] = useState("");
   const [breadcrumb, setBreadcrumb] = useState([]);
+  const theme = useTheme();
 
   const fetchData = useCallback(async () => {
     try {
@@ -32,40 +35,73 @@ const BreadCrumbsHeader = () => {
   }, [listId, spacingId]);
 
   useEffect(() => {
-    if (listId && spacingId) {
+    if (listId || spacingId) {
       fetchData();
     }
   }, [listId, spacingId, fetchData]);
 
   useEffect(() => {
+    const pathSegments = location.pathname.split("/").filter(Boolean); // Divide la ruta actual y elimina valores vacíos
     const breadcrumbItems = [];
-    if (nameSpacing) {
+
+    // Home (siempre presente)
+    breadcrumbItems.push({
+      label: "Click-FZT",
+      path: "/clickFZT/inicio",
+      icon: <Home sx={{ mr: 1, fill: theme.palette.primary.secondary }} />,
+    });
+
+    // Espacio (si existe spacingId)
+    if (spacingId && pathSegments.includes(spacingId)) {
       breadcrumbItems.push({
         label: nameSpacing,
-        icon: <FolderOpen sx={{ mr: 1, color: "text.secondary" }} />,
+        path: `/clickFZT/spacing/${spacingId}`,
+        icon: <Folder sx={{ mr: 1, fill: theme.palette.primary.secondary }} />,
       });
     }
-    if (nameList) {
+
+    // Lista (si existe listId)
+    if (listId && pathSegments.includes(listId)) {
       breadcrumbItems.push({
         label: nameList,
-        icon: <List sx={{ mr: 1, color: "text.secondary" }} />,
+        path: `/clickFZT/spacing/${spacingId}/list/${listId}`,
+        icon: <List sx={{ mr: 1, fill: theme.palette.primary.secondary }} />,
       });
     }
+
     setBreadcrumb(breadcrumbItems);
-  }, [nameList, nameSpacing]);
+  }, [location.pathname, nameSpacing, nameList, spacingId, listId, theme]);
 
   return (
-    <Grid container>
-      <Grid
-        sx={{
-          padding: "0px 0px 5px 0px",
-        }}
-      >
+    <Grid
+      sx={{
+        pl: 1,
+      }}
+      container
+    >
+      <Grid size={{ xs: 12 }}>
         <Breadcrumbs>
           {breadcrumb.map((item, index) => (
             <Box key={index} display="flex" alignItems="center">
-              {item.icon}
-              <Typography variant="body2" color="black">
+              <Box display="flex" alignItems="center">
+                {item.icon}
+              </Box>
+              <Typography
+                variant="body2"
+                color="black"
+                component={Link}
+                to={item.path}
+                sx={{
+                  fontSize: "1rem",
+                  textDecoration: "none",
+                  color: "black",
+                  display: "flex",
+                  alignItems: "center", // Asegura la alineación vertical del texto
+                  "&:hover": {
+                    textDecoration: "underline", // Subrayado en hover
+                  },
+                }}
+              >
                 {item.label}
               </Typography>
             </Box>

@@ -53,6 +53,9 @@ const MenuCards = ({ taskId, idStatus }) => {
         onClick={(event) => {
           handleMenuClick(event);
         }}
+        sx={{
+          padding: "0px 0px 0px 0px",
+        }}
       >
         <SyncAltIcon />
       </IconButton>

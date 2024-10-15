@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
-// import { useTheme, useMediaQuery } from "@mui/material";
+import { useTheme } from "@mui/material";
 import { Drawer, Box } from "@mui/material";
 import PropTypes from "prop-types";
-// import NavLinksBreadcrumbs from "./Breadcrumbs";
 import { menuIconsBar } from "./nav-links";
+import BreadCrumbsHeader from "../ui/breadcrumbs";
 import ListIconsMenu from "./list-icon-menu";
 import InitSideBar from "./init-side-bar";
 import AccountMenu from "../ui/account-menu";
@@ -21,6 +21,7 @@ const AppBarSite = ({ advisor }) => {
   const location = useLocation();
   const [selectedMenu, setSelectedMenu] = useState("home");
   const { isLoading } = useLoading();
+  const theme = useTheme();
 
   /** UseEffect to set menu selected change */
   useEffect(() => {
@@ -55,7 +56,7 @@ const AppBarSite = ({ advisor }) => {
             [`& .MuiDrawer-paper`]: {
               width: 75,
               boxSizing: "border-box",
-              background: "linear-gradient(to top, #578e22,  #0084cb)",
+              background: theme.palette.primary.main,
             },
           }}
         >
@@ -81,6 +82,7 @@ const AppBarSite = ({ advisor }) => {
             maxWidth: 280,
             minWidth: 300,
             padding: "5px 1px 15px 15px",
+            // background: theme.palette.secondary.main,
           }}
         >
           {/** Component List Side Bar to all Icons Menu
@@ -108,7 +110,7 @@ const AppBarSite = ({ advisor }) => {
             overflow: "auto",
             boxShadow: 3,
             borderRadius: 2,
-            border: "1px solid #ffffff",
+            // border: "1px solid #ffffff",
           }}
           id="box-outlet-main"
         >
@@ -118,11 +120,15 @@ const AppBarSite = ({ advisor }) => {
             sx={{
               display: "flex",
               alignItems: "center",
-              justifyContent: "end",
+              justifyContent: "space-between",
               padding: "0px 0px 0px 0px",
+              position: "sticky",
+              top: 0,
+              backgroundColor: "white",
+              zIndex: 1000,
             }}
           >
-            {/* <NavLinksBreadcrumbs /> */}
+            <BreadCrumbsHeader />
             {/** Component Account Menu to App ClickFZT
              * userName: String with the full name of the advisor
              */}
@@ -131,7 +137,7 @@ const AppBarSite = ({ advisor }) => {
 
           {/** Box to Outlet of the App */}
           <Box
-            sx={{ flexGrow: 1, padding: "0px 10px 0px 10px" }}
+            sx={{ flexGrow: 1, padding: "0px 20px 0px 20px" }}
             id="box-oulet"
           >
             {/** Component Outlet

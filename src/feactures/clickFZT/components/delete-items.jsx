@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import { Navigate } from "react-router-dom";
+// import { Navigate } from "react-router-dom";
 import { getData, deleteData } from "@/services/api";
 import PropTypes from "prop-types";
 import "../../../styles.css";
@@ -8,12 +8,11 @@ import "../../../styles.css";
 const handleDelete = (
   nameItem,
   idElement,
-  setRedirect,
+  // setRedirect,
   onClose,
   handleOpen,
   pathDelete
 ) => {
-  console.log(pathDelete);
   onClose();
   Swal.fire({
     title: "¿Estás seguro de eliminar este elemento?",
@@ -24,13 +23,15 @@ const handleDelete = (
     cancelButtonColor: "#d33",
     confirmButtonText: "Sí, eliminar",
     cancelButtonText: "Cancelar",
+    // background: "linear-gradient(to top, #578e22,  #0084cb)",
+    // color: "#ffffff",
     animation: true,
   }).then(async (result) => {
     if (result.isConfirmed) {
       await deleteData(pathDelete)
         .then(() => {
           Swal.fire("Eliminado", "El elemento ha sido eliminado", "success");
-          setRedirect(true);
+          // setRedirect(true);
         })
         .catch((error) => {
           Swal.fire({
@@ -53,12 +54,11 @@ const ConfirmDeleteItems = ({
   pathDelete,
 }) => {
   const [nameItem, setNameItem] = useState("");
-  const [redirect, setRedirect] = useState(false);
+  // const [redirect, setRedirect] = useState(false);
 
   useEffect(() => {
     // Obtener el nombre del elemento a eliminar
     getData(`${pathGet}`).then((data) => {
-      console.log(data);
       setNameItem(data.title);
     });
   }, [idElement, pathGet]);
@@ -68,7 +68,7 @@ const ConfirmDeleteItems = ({
       handleDelete(
         nameItem,
         idElement,
-        setRedirect,
+        // setRedirect,
         onClose,
         handleOpen,
         pathDelete
@@ -76,9 +76,9 @@ const ConfirmDeleteItems = ({
     }
   }, [nameItem, idElement, onClose, handleOpen, pathDelete]);
 
-  if (redirect) {
-    return <Navigate to="/clickFZT/inicio" />;
-  }
+  // if (redirect) {
+  //   return <Navigate to="/clickFZT/inicio" />;
+  // }
 
   return null;
 };

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Box, List } from "@mui/material";
 import PropTypes from "prop-types";
 import ListSideClickFZT from "@/feactures/clickFZT/components/sideBar/list-side-click-fzt";
-import Title from "../ui/title";
+// import Title from "../ui/title";
 
 /** Component to render to menu from menu selected
  * @param {array} listData - Array of objects with the list data
@@ -19,107 +19,27 @@ const InitSideBar = ({ userLogin, selectedMenu }) => {
     setContextMenu(selectedMenu);
   }, [selectedMenu]);
 
-  // console.log(selectedMenu);
-  // const [open, setOpen] = useState({});
-  // const location = useLocation();
-  // const [listDataFilter, setListDataFilter] = useState([]);
-
-  // useEffect(() => {
-  //   setListDataFilter(listData.filter((item) => item.id === selectedMenu));
-  // }, [selectedMenu, listData]);
-
-  // // Maneja el click para abrir/cerrar submenús
-  // const handleClick = (path) => {
-  //   if (!open[path]) {
-  //     setOpen((prevState) => ({ ...prevState, [path]: true }));
-  //   }
-  // };
-
-  // // Verifica si la ruta actual está seleccionada
-  // const isSelected = (path) => location.pathname === path;
-
-  // console.log(userArea);
-
-  // // Filtra los elementos por el área
-  // // const filterByArea = (items) => {
-  // //   return items
-  // //     .filter((item) => !item.area || item.area === userArea)
-  // //     .map((item) => ({
-  // //       ...item,
-  // //       children: item.children ? filterByArea(item.children) : [],
-  // //     }));
-  // // };
-
-  // // const filteredData = filterByArea(listDataFilter);
-
-  // // Función para renderizar los elementos del menú de manera recursiva
-  // const renderMenuItems = (items) => {
-  //   return items.map((item) => (
-  //     <div key={item.path || item.name}>
-  //       <ListItemButton
-  //         onClick={() => handleClick(item.path)}
-  //         component={item.path ? Link : undefined}
-  //         to={item.path || ""}
-  //         sx={{
-  //           pl: item.pl,
-  //           // backgroundColor: isSelected(item.path) ? "#0482cb" : "inherit",
-  //           borderRadius: 3,
-  //           // borderRight: isSelected(item.path)
-  //           //   ? "4px solid #7bd94b"
-  //           //   : "4px solid transparent",
-  //           "&:hover": {
-  //             backgroundColor: "#0f0f0f0",
-  //             // color: "#ffffff",
-  //           },
-  //           color: isSelected(item.path) ? "#0482cb" : "inherit",
-  //         }}
-  //         selected={isSelected(item.path)}
-  //       >
-  //         {item.icon && (
-  //           <ListItemIcon
-  //             sx={{
-  //               "& svg": {
-  //                 fill: isSelected(item.path) ? "#0482cb" : "#0d1f2d",
-  //               },
-  //             }}
-  //           >
-  //             {item.icon}
-  //           </ListItemIcon>
-  //         )}
-  //         <ListItemText primary={item.name} />
-  //         {item.children.length > 0 &&
-  //           (open[item.path] ? <ExpandLess /> : <ExpandMore />)}
-  //       </ListItemButton>
-  //       {item.children.length > 0 && (
-  //         <Collapse in={open[item.path]} timeout="auto" unmountOnExit>
-  //           <List sx={{ pl: 2 }}>{renderMenuItems(item.children)}</List>
-  //         </Collapse>
-  //       )}
-  //     </div>
-  //   ));
-  // };
-
   return (
     <>
       {/** Title */}
       <Box
         display="flex"
         pl={1}
-        justifyContent="flex-start"
-        alignItems="end"
+        justifyContent="center"
+        alignItems="center"
         id="box-title-side-bar"
         gap={1}
       >
         {/** Logo */}
-        <img src="/public/logo.png" alt="Logo" height="40px" />
+        <img src="/public/logo.png" alt="Logo" height="70px" />
 
-        {/** Título */}
+        {/* * Título
         <Title
           sx={{
             pl: 1,
           }}
           text="Click FZT"
-        />
+        /> */}
       </Box>
       {/** List of menu options */}
       <List sx={{ padding: 1 }} id="list-side-bar-init">

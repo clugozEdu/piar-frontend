@@ -1,8 +1,9 @@
 import { Box, Chip, Typography, IconButton } from "@mui/material";
+import { useTheme } from "@emotion/react";
 import Grid from "@mui/material/Grid2";
 import AddIcon from "@mui/icons-material/Add";
 import TaskCard from "./card-task";
-import { backStatusColor, getColorsScheme } from "@/utilities/helpers";
+import { getColorsScheme } from "@/utilities/helpers";
 
 import PropTypes from "prop-types";
 
@@ -11,8 +12,9 @@ const BoardTask = ({
   groupedTasks,
   stateParent,
   parent,
-  // handleAddTask,
+  handleAddTask,
 }) => {
+  const theme = useTheme();
   return (
     <>
       <Grid
@@ -36,8 +38,10 @@ const BoardTask = ({
               alignItems="center"
               justifyContent="space-between"
               sx={{
-                // background: "linear-gradient(45deg, #578e22 30%, #0084cb 90%)",
-                background: getColorsScheme(status.name, backStatusColor),
+                background: getColorsScheme(
+                  status.name,
+                  theme.palette.statusTask
+                ),
                 padding: "0px 0px 0px 0px",
                 marginBottom: 1,
                 color: "white",
@@ -67,7 +71,7 @@ const BoardTask = ({
                         fontSize: "1rem",
                       }}
                     >
-                      {groupedTasks[status.name]?.length || 0}
+                      ({groupedTasks[status.name]?.length || 0})
                     </Typography>
                   }
                   sx={{
@@ -79,6 +83,7 @@ const BoardTask = ({
                   sx={{
                     padding: "0px 10px 0px 0px",
                   }}
+                  onClick={() => handleAddTask(status.id)}
                 >
                   <AddIcon
                     sx={{
@@ -123,7 +128,7 @@ BoardTask.propTypes = {
   parent: PropTypes.func.isRequired,
   stateParent: PropTypes.func.isRequired,
   statusTask: PropTypes.array.isRequired,
-  // handleAddTask: PropTypes.func.isRequired,
+  handleAddTask: PropTypes.func.isRequired,
 };
 
 export default BoardTask;

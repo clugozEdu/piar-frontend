@@ -57,6 +57,21 @@ const DateMenuCard = ({ date, text, taskID }) => {
           vertical: "bottom",
           horizontal: "left",
         }}
+        sx={{
+          "& .MuiPaper-root": {
+            boxShadow: "none", // Eliminar sombra del menú
+            border: "1px solid #e0e0e0", // Agregar un borde si lo deseas
+          },
+        }}
+        MenuListProps={{
+          sx: {
+            "& .MuiMenuItem-root": {
+              "&:hover": {
+                backgroundColor: "transparent", // Eliminar hover
+              },
+            },
+          },
+        }}
       >
         <MenuItem
           sx={{

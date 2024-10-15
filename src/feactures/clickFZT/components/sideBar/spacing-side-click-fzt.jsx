@@ -8,7 +8,8 @@ import {
   ListItemText,
   Tooltip,
 } from "@mui/material";
-import { Link } from "react-router-dom";
+import { useTheme } from "@mui/material";
+import { Link, useParams } from "react-router-dom";
 import {
   ExpandLess,
   ExpandMore,
@@ -17,8 +18,8 @@ import {
   MoreVert,
   Delete,
 } from "@mui/icons-material";
+import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import EditIcon from "@mui/icons-material/Edit";
-import ListIcon from "@mui/icons-material/List";
 import PropTypes from "prop-types";
 import ConfirmDeleteItems from "../delete-items";
 import AddList from "../add-lists";
@@ -36,10 +37,11 @@ const SpacingsList = ({
   const [selectedSpacing, setSelectedSpacing] = useState("");
   const [selectedList, setSelectedList] = useState("");
   const [showAlert, setShowAlert] = useState(false);
+  const { spacingId, listId } = useParams();
+  const theme = useTheme();
 
   const handleEditList = (e, idList, idSpacing) => {
     e.preventDefault();
-    console.log("Edit list", idList);
     setSelectedList(idList);
     setIsDialogOpen(true);
     setSelectedSpacing(idSpacing);
@@ -49,7 +51,6 @@ const SpacingsList = ({
     e.preventDefault();
     setIsAlertDelete(true);
     setSelectedList(idList);
-    console.log("Delete list", idList);
   };
 
   return (
@@ -91,7 +92,7 @@ const SpacingsList = ({
           duration={3000}
           severity="success"
           vertical="bottom"
-          horizontal="left"
+          horizontal="right"
         />
       )}
 
@@ -112,23 +113,28 @@ const SpacingsList = ({
             >
               {/* Render Items */}
               <ListItemButton
+                id="spacing-item-button"
                 component={Link}
                 to={`clickFZT/spacing/${spacing.id}`}
                 sx={{
                   padding: 0.5,
                   mb: open[spacing.id] ? 0 : 1,
                   borderRadius: open[spacing.id] ? "5px 5px 0 0" : 5,
+                  backgroundColor:
+                    open[spacing.id] || spacingId === spacing.id
+                      ? theme.palette.action.selected
+                      : "transparent",
                   "&:hover": {
-                    backgroundColor: "transparent",
+                    backgroundColor: theme.palette.action.hover,
                   },
                 }}
                 // Remove the onClick handler from ListItemButton
               >
                 {/* Folder Icon */}
                 {open[spacing.id] ? (
-                  <FolderOpen sx={{ fill: "#578e22" }} />
+                  <FolderOpen sx={{ fill: theme.palette.primary.main }} />
                 ) : (
-                  <Folder sx={{ fill: "#578e22" }} />
+                  <Folder sx={{ fill: theme.palette.secondary.main }} />
                 )}
                 {/* Spacing Name */}
                 <ListItemText primary={spacing.title} sx={{ pl: 0.5 }} />
@@ -140,8 +146,17 @@ const SpacingsList = ({
                     e.stopPropagation(); // Prevent navigation
                     handleClick(e, spacing.id);
                   }}
+                  sx={{
+                    "&:hover": {
+                      backgroundColor: "transparent",
+                    },
+                  }}
                 >
-                  {open[spacing.id] ? <ExpandLess /> : <ExpandMore />}
+                  {open[spacing.id] ? (
+                    <ExpandLess sx={{ fill: theme.palette.primary.main }} />
+                  ) : (
+                    <ExpandMore sx={{ fill: theme.palette.secondary.main }} />
+                  )}
                 </IconButton>
 
                 {/* More Options */}
@@ -151,8 +166,18 @@ const SpacingsList = ({
                     e.stopPropagation(); // Prevent navigation
                     handleMenuClick(e, spacing.id);
                   }}
+                  sx={{
+                    "&:hover": {
+                      backgroundColor: "transparent",
+                    },
+                  }}
                 >
-                  <MoreVert />
+                  <MoreVert
+                    sx={{
+                      fill: theme.palette.primary.main,
+                      transform: "rotate(90deg)",
+                    }}
+                  />
                 </IconButton>
               </ListItemButton>
 
@@ -167,6 +192,7 @@ const SpacingsList = ({
                     : "none",
                   borderRadius: "0 0 8px 8px",
                   pl: 1,
+                  pr: 1,
                 }}
               >
                 <List component="div" disablePadding>
@@ -180,12 +206,19 @@ const SpacingsList = ({
                         mt: 1,
                         mb: 1,
                         p: "0px 10px 0px 0px",
+                        borderRadius: 2,
+                        background:
+                          listId === list.id
+                            ? theme.palette.action.selected
+                            : "transparent",
                         "&:hover": {
-                          backgroundColor: "transparent",
+                          backgroundColor: theme.palette.action.hover,
                         },
                       }}
                     >
-                      <ListIcon sx={{ fill: "#0084cb" }} />
+                      <FormatListBulletedIcon
+                        sx={{ fill: theme.palette.primary.secondary }}
+                      />
                       {/* List Name */}
                       <ListItemText sx={{ pl: 1 }} primary={list.title} />
                       {/* Edit/Delete Buttons if owner */}
@@ -206,8 +239,15 @@ const SpacingsList = ({
                                   e.stopPropagation(); // Prevent navigation
                                   handleEditList(e, list.id, spacing.id);
                                 }}
+                                sx={{
+                                  "&:hover": {
+                                    backgroundColor: "transparent",
+                                  },
+                                }}
                               >
-                                <EditIcon sx={{ fill: "#0084cb" }} />
+                                <EditIcon
+                                  sx={{ fill: theme.palette.primary.secondary }}
+                                />
                               </IconButton>
                             </Tooltip>
                           </Box>
@@ -220,8 +260,15 @@ const SpacingsList = ({
                                   e.stopPropagation(); // Prevent navigation
                                   handleDeleteList(e, list.id);
                                 }}
+                                sx={{
+                                  "&:hover": {
+                                    backgroundColor: "transparent",
+                                  },
+                                }}
                               >
-                                <Delete sx={{ fill: "#0084cb" }} />
+                                <Delete
+                                  sx={{ fill: theme.palette.primary.secondary }}
+                                />
                               </IconButton>
                             </Tooltip>
                           </Box>

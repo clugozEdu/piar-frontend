@@ -13,10 +13,11 @@
  */
 
 import { useEffect, useState } from "react";
+import { useTheme } from "@emotion/react";
 import PropTypes from "prop-types";
 import { Chip, MenuItem, Menu } from "@mui/material";
 import { Flag } from "@mui/icons-material";
-// import { getColorsScheme, priorityColors } from "@/utilities/helpers";
+import { getColorsScheme } from "@/utilities/helpers";
 // import { handlerUpdateBD } from "../../../supabaseServices";
 // import useUser from "../../../context/users";
 
@@ -44,6 +45,7 @@ const PriorityChip = ({ priority, idTask }) => {
   // const { advisorLogin } = useUser();
   const [itemsMenu, setItemsMenu] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
+  const theme = useTheme();
 
   // Actualizar el estado de las opciones de prioridad
   useEffect(() => {
@@ -77,11 +79,9 @@ const PriorityChip = ({ priority, idTask }) => {
         label={priority.name}
         icon={
           <Flag
-            sx={
-              {
-                // fill: "white",
-              }
-            }
+            sx={{
+              fill: getColorsScheme(priority.name, theme.palette.priorityTask),
+            }}
           />
         }
         onClick={(e) => handleMenuClick(e)}
@@ -91,7 +91,7 @@ const PriorityChip = ({ priority, idTask }) => {
             backgroundColor: "transparent", // Mantener el color de fondo original
           },
           // color: "white",
-          mr: 1,
+          // mr: 1,
         }}
       />
       <Menu
@@ -99,7 +99,6 @@ const PriorityChip = ({ priority, idTask }) => {
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
-        sx={{}}
       >
         {itemsMenu.map((item) => (
           <MenuItem
@@ -109,6 +108,12 @@ const PriorityChip = ({ priority, idTask }) => {
               handlePriorityUpdate(e);
             }}
           >
+            <Flag
+              sx={{
+                fill: getColorsScheme(item.label, theme.palette.priorityTask),
+                mr: 1,
+              }}
+            />
             {item.label}
           </MenuItem>
         ))}

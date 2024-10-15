@@ -5,6 +5,7 @@ import {
   ListItemIcon,
   Typography,
 } from "@mui/material";
+import { useTheme } from "@emotion/react";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 
@@ -14,6 +15,7 @@ import PropTypes from "prop-types";
  * @param {function} setSelectedMenu - Function to set the selected menu
  */
 const ListIconsMenu = ({ arrayMenu, selectedMenu, setSelectedMenu }) => {
+  const theme = useTheme();
   /** Function to change menu selected */
   const handleClick = (id) => {
     setSelectedMenu(id);
@@ -33,14 +35,15 @@ const ListIconsMenu = ({ arrayMenu, selectedMenu, setSelectedMenu }) => {
           to={item.path || ""}
           sx={{
             pl: item.pl,
-            backgroundColor: isSelected(item.id) ? "#fffff" : "inherit",
             borderBottom: isSelected(item.id)
               ? "4px solid #7bd94b"
               : "4px solid transparent",
             "&:hover": {
-              backgroundColor: "#508d31",
+              backgroundColor: theme.palette.drawer.hover,
             },
-            color: isSelected(item.id) ? "#7bd94b" : "#ffffff",
+            color: isSelected(item.id)
+              ? theme.palette.drawer.selected
+              : "#ffffff",
             flexDirection: "column",
             alignItems: "center",
           }}
@@ -52,7 +55,9 @@ const ListIconsMenu = ({ arrayMenu, selectedMenu, setSelectedMenu }) => {
               sx={{
                 minWidth: "auto",
                 "& svg": {
-                  fill: isSelected(item.id) ? "#7bd94b" : "#ffffff",
+                  fill: isSelected(item.id)
+                    ? theme.palette.drawer.selected
+                    : "#ffffff",
                 },
               }}
             >

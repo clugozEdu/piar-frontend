@@ -1,14 +1,19 @@
 import { useState } from "react";
-import { Menu, MenuItem, Typography, Box } from "@mui/material";
+import {
+  Menu,
+  MenuItem,
+  Typography,
+  Box,
+  TextField,
+  Button,
+} from "@mui/material";
 import ScheduleIcon from "@mui/icons-material/Schedule";
 import PropTypes from "prop-types";
-import { convertHours, timeOptions } from "@/utilities/helpers";
-// import { handlerUpdateBD } from "../../../supabaseServices";
-// import useUser from "../../../context/users";
+import { convertHours } from "@/utilities/helpers";
 
 const TimeMenu = ({ task }) => {
-  // const { advisorLogin } = useUser();
   const [anchorEl, setAnchorEl] = useState(null);
+  const [inputValue, setInputValue] = useState(task.time_task); // Estado para almacenar el valor ingresado por el usuario
 
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -18,14 +23,23 @@ const TimeMenu = ({ task }) => {
     setAnchorEl(null);
   };
 
-  // const handleUpdateTime = (value) => {
-  //   const columnUpdate = {
-  //     time_task: value,
-  //     user_id_update: advisorLogin.sub,
-  //   };
-  //   handlerUpdateBD("table_tasks", columnUpdate, task.id);
-  //   handleMenuClose();
-  // };
+  const handleInputChange = (event) => {
+    const value = event.target.value;
+    // Asegurarse de que el valor ingresado sea numérico
+    if (!isNaN(value)) {
+      setInputValue(value);
+    }
+  };
+
+  const handleSaveTime = () => {
+    if (inputValue !== null && inputValue !== "") {
+      console.log(
+        `Guardando tiempo: ${inputValue} hrs para la tarea ${task.id}`
+      );
+      // Aquí se puede actualizar la base de datos
+      handleMenuClose(); // Cerrar el menú después de guardar
+    }
+  };
 
   return (
     <>
@@ -51,15 +65,59 @@ const TimeMenu = ({ task }) => {
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
+        // Usamos sx directamente en el componente Menu
+        sx={{
+          "& .MuiPaper-root": {
+            boxShadow: "none", // Eliminar sombra del menú
+            border: "1px solid #e0e0e0", // Agregar un borde si lo deseas
+          },
+        }}
+        MenuListProps={{
+          sx: {
+            padding: 1, // Eliminar padding de la lista
+            "& .MuiMenuItem-root": {
+              "&:hover": {
+                backgroundColor: "transparent", // Eliminar hover
+              },
+            },
+          },
+        }}
       >
-        {timeOptions.map((option, index) => (
-          <MenuItem
-            key={index}
-            //  onClick={() => handleUpdateTime(option.value)}
+        <MenuItem
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-start",
+            width: "200px", // Ajustar el tamaño del menú
+            "&:hover": {
+              backgroundColor: "transparent", // Eliminar cualquier color de fondo en hover
+            },
+          }}
+        >
+          <TextField
+            label="Tiempo (horas)"
+            type="number" // Solo acepta números
+            value={inputValue}
+            onChange={handleInputChange}
+            sx={{
+              marginBottom: 2,
+              width: "100%",
+              "&:hover": {
+                backgroundColor: "transparent", // Evitar hover en TextField
+              },
+              "& .MuiInputBase-root": {
+                borderRadius: "20px",
+              },
+            }}
+          />
+          <Button
+            variant="contained"
+            onClick={handleSaveTime}
+            sx={{ width: "100%" }}
           >
-            {option.label}
-          </MenuItem>
-        ))}
+            Actualizar
+          </Button>
+        </MenuItem>
       </Menu>
     </>
   );

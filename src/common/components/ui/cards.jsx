@@ -13,6 +13,7 @@ const CardsForms = (props) => {
       <CardHeader
         sx={{
           bgcolor: props.hcolor || "primary.main",
+          padding: 0.5,
           // borderBottom: "1px solid grey.300",
         }}
         title={
