@@ -15,33 +15,13 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "@emotion/react";
 import PropTypes from "prop-types";
-import { Chip, MenuItem, Menu } from "@mui/material";
-import { Flag } from "@mui/icons-material";
+import { Box, MenuItem, Menu, IconButton, Typography } from "@mui/material";
+import { Flag } from "lucide-react";
 import { getColorsScheme } from "@/utilities/helpers";
-// import { handlerUpdateBD } from "../../../supabaseServices";
-// import useUser from "../../../context/users";
+import { putData } from "@/services/api";
 
 // Opciones de prioridad
-const initialItemsMenu = [
-  {
-    id: "3e777c25-bd01-4f46-9610-4779cc353e83",
-    label: "Alta",
-  },
-  {
-    id: "164ae4c6-f030-4d67-a4d7-255e1235d6b3",
-    label: "Baja",
-  },
-  {
-    id: "fc4773b3-00dc-4535-b710-22c3f0df6c14",
-    label: "Media",
-  },
-  {
-    id: 4,
-    label: "Urgente",
-  },
-];
-
-const PriorityChip = ({ priority, idTask }) => {
+const PriorityChip = ({ priority, task, setShowAlert, priorityTask }) => {
   // const { advisorLogin } = useUser();
   const [itemsMenu, setItemsMenu] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -50,9 +30,9 @@ const PriorityChip = ({ priority, idTask }) => {
   // Actualizar el estado de las opciones de prioridad
   useEffect(() => {
     if (priority) {
-      setItemsMenu(initialItemsMenu.filter((item) => item.id !== priority.id));
+      setItemsMenu(priorityTask?.filter((item) => item.id !== priority.id));
     }
-  }, [priority]);
+  }, [priority, priorityTask]);
 
   // Mostrar el menú al hacer clic en el chip
   const handleMenuClick = (event) => {
@@ -66,41 +46,52 @@ const PriorityChip = ({ priority, idTask }) => {
   };
 
   // Actualizar la prioridad de la tarea
-  const handlePriorityUpdate = (e) => {
-    console.log(`Prioridad seleccionada: ${e.target.id} de la tarea ${idTask}`);
-    // Actualizar la base de datos
+  const handlePriorityUpdate = async (e) => {
+    const dataPost = {
+      priority_id: e.target.id,
+    };
 
+    await putData(`api/clickup/tasks/${task.id}`, dataPost);
+    setShowAlert(true);
+
+    // Actualizar la base de datos
     handleMenuClose();
   };
 
   return (
     <>
-      <Chip
-        label={priority.name}
-        icon={
+      <Box display="flex" alignItems="center">
+        <IconButton
+          onClick={(e) => handleMenuClick(e)}
+          sx={{
+            padding: 0,
+            "&:hover": {
+              backgroundColor: theme.palette.action.hover,
+            },
+            borderRadius: 1,
+          }}
+        >
           <Flag
-            sx={{
-              fill: getColorsScheme(priority.name, theme.palette.priorityTask),
-            }}
+            color={getColorsScheme(priority.name, theme.palette.priorityTask)}
+            size={24}
           />
-        }
-        onClick={(e) => handleMenuClick(e)}
-        sx={{
-          backgroundColor: "transparent",
-          "&:hover": {
-            backgroundColor: "transparent", // Mantener el color de fondo original
-          },
-          // color: "white",
-          // mr: 1,
-        }}
-      />
+        </IconButton>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ fontSize: "0.8rem", ml: 1 }}
+        >
+          {priority.name}
+        </Typography>
+      </Box>
+
       <Menu
         id="menu"
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
       >
-        {itemsMenu.map((item) => (
+        {itemsMenu?.map((item) => (
           <MenuItem
             id={item.id}
             key={item.id}
@@ -109,12 +100,12 @@ const PriorityChip = ({ priority, idTask }) => {
             }}
           >
             <Flag
-              sx={{
-                fill: getColorsScheme(item.label, theme.palette.priorityTask),
-                mr: 1,
-              }}
+              color={getColorsScheme(item.name, theme.palette.priorityTask)}
+              size={24}
             />
-            {item.label}
+            <Typography variant="body2" sx={{ ml: 1 }}>
+              {item.name}
+            </Typography>
           </MenuItem>
         ))}
       </Menu>
@@ -125,7 +116,9 @@ const PriorityChip = ({ priority, idTask }) => {
 // Validar props del componente PriorityChip
 PriorityChip.propTypes = {
   priority: PropTypes.object.isRequired,
-  idTask: PropTypes.string,
+  task: PropTypes.object,
+  setShowAlert: PropTypes.func,
+  priorityTask: PropTypes.array,
 };
 
 export default PriorityChip;

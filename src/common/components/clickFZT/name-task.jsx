@@ -6,49 +6,66 @@ import {
   TextField,
   Button,
   Divider,
+  IconButton,
 } from "@mui/material";
+import { useTheme } from "@mui/material";
 import PropTypes from "prop-types";
-import { Title } from "@mui/icons-material";
+import { TypeOutline } from "lucide-react";
 import { Link } from "react-router-dom";
+import { putData } from "@/services/api";
+import { getColorsScheme } from "@/utilities/helpers";
 
-const TitleMenu = ({ task }) => {
+const TitleMenu = ({ task, setShowAlert }) => {
   const [anchorEl, setAnchorEl] = useState(null);
-  const [newTitle, setNewTitle] = useState(task.name_task);
+  const [newTitle, setNewTitle] = useState(task.title || "");
+  const theme = useTheme();
 
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
-    setNewTitle(task.name_task); // Reiniciar el título al abrir el menú
+    setNewTitle(task.title || ""); // Reiniciar el título al abrir el menú
   };
 
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
 
-  // const handleUpdateTitle = () => {
-  //   const columnUpdate = {
-  //     name_task: newTitle,
-  //     user_id_update: advisorLogin.sub,
-  //   };
-  //   handlerUpdateBD("table_tasks", columnUpdate, task.id);
-  //   handleMenuClose();
-  // };
+  const handleUpdateTitle = async () => {
+    const dataPost = {
+      title: newTitle,
+    };
+    await putData(`api/clickup/tasks/${task.id}`, dataPost);
+    setShowAlert(true);
+    handleMenuClose();
+  };
 
   return (
     <>
       <Box display={"flex"} alignItems={"center"}>
-        <Title
+        <IconButton
           onClick={handleMenuClick}
           sx={{
-            mr: 1,
-            color: "text.secondary",
-            cursor: "pointer",
+            padding: 0,
+            "&:hover": {
+              backgroundColor: theme.palette.action.hover,
+            },
+            borderRadius: 1,
           }}
-        />
+        >
+          <TypeOutline
+            size={20}
+            color={getColorsScheme(task.status.name, theme.palette.statusTask)}
+          />
+        </IconButton>
         <Divider
           orientation={"vertical"}
           flexItem
           sx={{
             mr: 1,
+            ml: 1,
+            background: getColorsScheme(
+              task.status.name,
+              theme.palette.statusTask
+            ),
           }}
         />
         <Typography
@@ -64,7 +81,7 @@ const TitleMenu = ({ task }) => {
         </Typography>
       </Box>
       <Menu
-        id="menu"
+        id="menu-name"
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
@@ -84,8 +101,8 @@ const TitleMenu = ({ task }) => {
           <Button
             variant="contained"
             color="primary"
-            // onClick={handleUpdateTitle}
-            sx={{ mt: 2, borderRadius: 2 }}
+            onClick={() => handleUpdateTitle()}
+            sx={{ mt: 2, borderRadius: 2, width: "100%" }}
           >
             Actualizar
           </Button>
@@ -98,6 +115,7 @@ const TitleMenu = ({ task }) => {
 // Validar las props del componente
 TitleMenu.propTypes = {
   task: PropTypes.object.isRequired,
+  setShowAlert: PropTypes.func,
 };
 
 export default TitleMenu;

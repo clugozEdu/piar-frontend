@@ -11,7 +11,6 @@ import { stringAvatar } from "@/utilities/helpers";
 import TableComponent from "@/common/components/ui/table";
 
 const TableDetails = ({ lists, users }) => {
-  console.log(users);
   const { spacingId } = useParams(); // Destructuración directa del objeto devuelto por useParams
 
   const filterUsers = (allUsers, filterUsers) => {

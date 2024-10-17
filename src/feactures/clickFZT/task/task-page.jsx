@@ -1,6 +1,7 @@
 import { useEffect, useCallback, useState } from "react";
 import { Box } from "@mui/material";
 import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { getData } from "@/services/api";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import useLoading from "@/common/hooks/calllbacks/loading";
@@ -17,25 +18,27 @@ const TaskPage = () => {
   const { listId } = useParams();
   const [task, setTask] = useState([]);
   const [statusTask, setStatusTask] = useState([]);
+  const [priorityTask, setPriorityTask] = useState([]);
   const [currentView, setCurrentView] = useState("board");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [idStatus, setIdStatus] = useState("");
   const [showAlert, setShowAlert] = useState(false);
+  const [messageAlert, setMessageAlert] = useState("");
   const [parent] = useAutoAnimate();
   const [stateParent] = useAutoAnimate();
   const { setIsLoading } = useLoading();
+  const { advisor } = useSelector((state) => state.loginAdvisor);
   const message = useWebSocket();
 
   const fetchTask = useCallback(() => {
-    setIsLoading(true);
     getData(`api/clickup/list/${listId}/tasks`).then((data) => setTask(data));
     getData(`api/clickup/status`).then((data) => setStatusTask(data));
-  }, [listId, setIsLoading]);
+    getData("api/clickup/priority").then((data) => setPriorityTask(data));
+  }, [listId]);
 
   useEffect(() => {
     if (listId) {
       fetchTask();
-
       setTimeout(() => {
         setIsLoading(false);
       }, 2000);
@@ -43,17 +46,21 @@ const TaskPage = () => {
   }, [listId, fetchTask, setIsLoading]);
 
   useEffect(() => {
-    const event = message[0]?.event;
-    console.log(event);
-
-    if (event == "task_created") {
+    const event = message?.event;
+    console.log("Event desde TaskPage = ", message);
+    if (event) {
       fetchTask();
-      setTimeout(() => {
-        setIsLoading(false);
+
+      if (event.advisor_id === advisor.id) {
         setShowAlert(true);
-      }, 2000);
+        setIsLoading(true);
+        setMessageAlert(event);
+      }
     }
-  }, [message, fetchTask, setIsLoading]);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+  }, [message, fetchTask, setIsLoading, listId, advisor.id]);
 
   const isTaskOverdue = (dueDate, statusTask) => {
     if (statusTask === "Done") {
@@ -69,6 +76,7 @@ const TaskPage = () => {
     .map((task) => ({
       ...task,
       overdue: isTaskOverdue(task.end_date, task.status.name),
+      isOwnerTask: task.owner_advisor.id === advisor.id,
     }))
     .sort((a, b) => dayjs(a.end_date).diff(dayjs(b.end_date)))
     .reduce((acc, task) => {
@@ -103,6 +111,8 @@ const TaskPage = () => {
           stateParent={stateParent}
           parent={parent}
           handleAddTask={handleAddTask}
+          setShowAlert={setShowAlert}
+          priorityTask={priorityTask}
         />
       )}
 
@@ -111,13 +121,17 @@ const TaskPage = () => {
           groupedTasks={groupedTasks}
           statusTask={statusTask}
           handleAddTask={handleAddTask}
+          setShowAlert={setShowAlert}
+          priorityTask={priorityTask}
         />
       )}
 
       {/* Dialog Create Task */}
       <CreateDialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
         <AddTask
+          statusTask={statusTask}
           openDialog={isDialogOpen}
+          setShowAlert={setShowAlert}
           setIsDialogOpen={setIsDialogOpen}
           idStatus={idStatus}
           idList={listId}
@@ -127,7 +141,13 @@ const TaskPage = () => {
       {showAlert && (
         <SnackbarMessage
           open={showAlert}
-          message="Tarea creada correctamente"
+          message={
+            messageAlert === "task_created"
+              ? "Tarea creada"
+              : messageAlert === "task_deleted"
+              ? "Tarea eliminada"
+              : "Tarea actualizada"
+          }
           title={"Completado"}
           onCloseHandler={() => {
             setShowAlert(false);

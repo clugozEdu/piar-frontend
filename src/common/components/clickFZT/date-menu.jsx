@@ -1,26 +1,35 @@
 import { useState } from "react";
-import { Typography, Menu, MenuItem, Box } from "@mui/material";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { useTheme } from "@emotion/react";
+import { Typography, Menu, Box, IconButton } from "@mui/material";
+import { CalendarDays } from "lucide-react";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
-import dayjs from "dayjs";
+import { formatDate, getColorsScheme } from "@/utilities/helpers";
 import PropTypes from "prop-types";
-import { formatDate } from "@/utilities/helpers";
+import { putData } from "@/services/api";
 
-const DateMenuCard = ({ date, text, taskID }) => {
-  // const { advisorLogin } = useUser();
+const DateMenuCard = ({ text, task, keyUpdate, setShowAlert }) => {
+  const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState(null);
-  const [dateVisit, setDateVisit] = useState(date);
+  const [dateVisit, setDateVisit] = useState(task[keyUpdate]);
 
   // Formatear la fecha para mostrarla en el componente
-  const formattedDate = date ? formatDate(date) : null;
+  const formattedDate = task[keyUpdate]
+    ? formatDate(task[keyUpdate])
+    : "Sin Fecha";
 
-  const handleDateChange = (newValue) => {
-    console.log(`Fecha seleccionada: ${newValue} de la tarea ${taskID}`);
-    setDateVisit(newValue); // Actualizar la fecha en el componente
-    // Actualizar la base de datos
-    // Cerrar el menú después de seleccionar una fecha
+  const handleDateChange = async (newValue) => {
+    setDateVisit(newValue);
+
+    const formattedDate = newValue ? new Date(newValue) : null;
+
+    const dataPost = {
+      [keyUpdate]: formattedDate,
+    };
+
+    await putData(`api/clickup/tasks/${task.id}`, dataPost);
+    setShowAlert(true);
     handleMenuClose();
   };
 
@@ -37,57 +46,50 @@ const DateMenuCard = ({ date, text, taskID }) => {
   return (
     <>
       <Box display="flex" alignItems="center">
-        <CalendarMonthIcon
-          sx={{ mr: 1, color: "text.secondary", cursor: "pointer" }}
+        <IconButton
+          sx={{
+            padding: 0,
+            "&:hover": {
+              backgroundColor: theme.palette.action.hover,
+            },
+            borderRadius: 1,
+          }}
           onClick={handleIconClick}
-        />
+        >
+          <CalendarDays
+            size={24}
+            color={getColorsScheme(task.status.name, theme.palette.statusTask)}
+          />
+        </IconButton>
+
         <Typography
           variant="body2"
-          sx={{ color: "text.secondary", fontSize: "0.8rem" }}
+          color="text.secondary"
+          sx={{
+            fontSize: "0.8rem",
+            ml: 1,
+          }}
         >
           {text} {formattedDate}
         </Typography>
       </Box>
 
       <Menu
+        id="menu-calendar"
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
-        }}
-        sx={{
-          "& .MuiPaper-root": {
-            boxShadow: "none", // Eliminar sombra del menú
-            border: "1px solid #e0e0e0", // Agregar un borde si lo deseas
-          },
-        }}
-        MenuListProps={{
-          sx: {
-            "& .MuiMenuItem-root": {
-              "&:hover": {
-                backgroundColor: "transparent", // Eliminar hover
-              },
-            },
-          },
-        }}
       >
-        <MenuItem
-          sx={{
-            "&:hover": {
-              backgroundColor: "transparent", // Quitar el efecto de hover
-            },
-          }}
-        >
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <Box sx={{ p: 1 }}>
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DateCalendar
-              views={["day"]}
-              value={dateVisit ? dayjs(dateVisit, "YYYY/MM/DD") : null}
+              views={["month", "day"]}
+              value={dateVisit ? new Date(dateVisit) : null}
               onChange={handleDateChange}
+              format="dd/MM/yyyy"
             />
           </LocalizationProvider>
-        </MenuItem>
+        </Box>
       </Menu>
     </>
   );
@@ -95,9 +97,11 @@ const DateMenuCard = ({ date, text, taskID }) => {
 
 // Validar las props del componente
 DateMenuCard.propTypes = {
-  date: PropTypes.string.isRequired,
+  date: PropTypes.string,
   text: PropTypes.string,
-  taskID: PropTypes.string,
+  task: PropTypes.object,
+  keyUpdate: PropTypes.string,
+  setShowAlert: PropTypes.func,
 };
 
 export default DateMenuCard;

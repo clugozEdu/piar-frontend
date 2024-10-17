@@ -8,12 +8,12 @@ import {
   Tooltip,
   Avatar,
   Chip,
+  Typography,
+  Divider,
 } from "@mui/material";
 import { useTheme } from "@emotion/react";
 import PropTypes from "prop-types";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import AddIcon from "@mui/icons-material/Add";
-import EventBusyIcon from "@mui/icons-material/EventBusy"; // Importar el icono
+import { CirclePlus, ChevronsDown, CircleDot } from "lucide-react";
 import { getColorsScheme, stringAvatar } from "@/utilities/helpers";
 import MenuCards from "@/common/components/clickFZT/menu-card-task";
 import PriorityChip from "@/common/components/clickFZT/priority-chip";
@@ -21,8 +21,15 @@ import DateMenuCard from "@/common/components/clickFZT/date-menu";
 import TimeMenu from "@/common/components/clickFZT/time-menu";
 import DescriptionMenuCard from "@/common/components/clickFZT/description-task";
 import TableTasks from "@/common/components/clickFZT/table-task";
+import TitleMenu from "@/common/components/clickFZT/name-task";
 
-const ListTask = ({ groupedTasks, statusTask, handleAddTask }) => {
+const ListTask = ({
+  groupedTasks,
+  statusTask,
+  handleAddTask,
+  setShowAlert,
+  priorityTask,
+}) => {
   const theme = useTheme();
 
   const [expanded, setExpanded] = useState(
@@ -57,48 +64,52 @@ const ListTask = ({ groupedTasks, statusTask, handleAddTask }) => {
 
   const transformRow = (task) => {
     const userName = `${task.owner_advisor.first_name} ${task.owner_advisor.last_name}`;
+    const isOverdue = task.overdue;
+
     return {
       id: task.id,
+      isOverdue: isOverdue,
       description: (
-        <DescriptionMenuCard description={task.description} taskID={task.id} />
+        <DescriptionMenuCard task={task} setShowAlert={setShowAlert} />
       ),
-      title: task.title,
+      title: <TitleMenu task={task} setShowAlert={setShowAlert} />,
       start_date: (
         <DateMenuCard
-          date={task.start_date}
-          // text={"Inicio: "}
-          taskID={task.id}
+          task={task}
+          text={"Inicio: "}
           keyUpdate={"start_date"}
+          setShowAlert={setShowAlert}
         />
       ),
       end_date: (
         <DateMenuCard
-          date={task.end_date}
-          // text={"Fin: "}
-          taskID={task.id}
+          task={task}
           keyUpdate={"end_date"}
+          setShowAlert={setShowAlert}
         />
       ),
-      time_task: <TimeMenu task={task} />,
+      time_task: <TimeMenu task={task} setShowAlert={setShowAlert} />,
       status: (
-        <Box display="flex" alignItems="center">
-          <PriorityChip priority={task.priority} idTask={task.id} />
-          {task.overdue && (
-            <Chip
-              label="Atrasada"
-              icon={
-                <EventBusyIcon
-                  sx={{
-                    fill: "white",
-                  }}
-                />
-              }
-              sx={{
-                backgroundColor: "#FF3D3D",
-                color: "white",
-                ml: 1,
-              }}
-            />
+        <Box display="flex" alignItems="center" justifyContent="space-between">
+          <PriorityChip
+            priorityTask={priorityTask}
+            priority={task.priority}
+            task={task}
+            setShowAlert={setShowAlert}
+          />
+
+          {isOverdue && (
+            <>
+              <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+              <CircleDot size={24} color={"#f44336"} />
+              <Typography
+                variant="body2"
+                sx={{ fontSize: "0.8rem", ml: 1 }}
+                color={isOverdue ? "error" : "textPrimary"}
+              >
+                Atrasada
+              </Typography>
+            </>
           )}
         </Box>
       ),
@@ -114,7 +125,13 @@ const ListTask = ({ groupedTasks, statusTask, handleAddTask }) => {
           />
         </Tooltip>
       ),
-      actions: <MenuCards idStatus={task.status.id} taskId={task.id} />,
+      actions: (
+        <MenuCards
+          task={task}
+          statusTask={statusTask}
+          setShowAlert={setShowAlert}
+        />
+      ),
     };
   };
 
@@ -123,14 +140,19 @@ const ListTask = ({ groupedTasks, statusTask, handleAddTask }) => {
       {statusTask.map((status) => (
         <Accordion
           sx={{
-            boxShadow: 3,
+            boxShadow: 2,
           }}
           key={status.id}
           expanded={expanded[status.id]}
           onChange={() => handleAccordionChange(status.id)}
         >
           <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
+            expandIcon={
+              <ChevronsDown
+                size={24}
+                color={getColorsScheme(status.name, theme.palette.statusTask)}
+              />
+            }
             aria-controls="panel1a-content"
             id="panel1a-header"
             sx={{
@@ -139,7 +161,12 @@ const ListTask = ({ groupedTasks, statusTask, handleAddTask }) => {
               justifyContent: "space-between",
             }}
           >
-            <Box display="flex" alignItems="center">
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="flex-start"
+              sx={{ flexGrow: 1 }}
+            >
               <Chip
                 label={status.name}
                 sx={{
@@ -150,14 +177,35 @@ const ListTask = ({ groupedTasks, statusTask, handleAddTask }) => {
                   color: "white",
                 }}
               />
+              <Typography
+                variant="h6"
+                component="div"
+                sx={{
+                  ml: 1,
+                }}
+              >
+                {groupedTasks[status.name]?.length || 0}
+              </Typography>
+            </Box>
+            <Box display="flex" alignItems="center">
+              <Typography
+                variant="body1"
+                sx={{
+                  ml: 1,
+                }}
+              >
+                Agregar Tarea
+              </Typography>
               <IconButton
-                aria-hidden="true"
                 sx={{
                   ml: 1,
                 }}
                 onClick={(e) => handleAddButtonClick(e, status.id)}
               >
-                <AddIcon />
+                <CirclePlus
+                  size={24}
+                  color={getColorsScheme(status.name, theme.palette.statusTask)}
+                />
               </IconButton>
             </Box>
           </AccordionSummary>
@@ -178,6 +226,8 @@ ListTask.propTypes = {
   groupedTasks: PropTypes.object.isRequired,
   statusTask: PropTypes.array,
   handleAddTask: PropTypes.func.isRequired,
+  priorityTask: PropTypes.array,
+  setShowAlert: PropTypes.func,
 };
 
 export default ListTask;

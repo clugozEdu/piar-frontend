@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useTheme } from "@emotion/react";
 import { Breadcrumbs, Typography, Box } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import { Folder, List, Home } from "@mui/icons-material";
+import { FolderOpen, List, House } from "lucide-react";
 import { useParams, Link, useLocation } from "react-router-dom";
 import { getData } from "@/services/api";
 
@@ -48,7 +48,7 @@ const BreadCrumbsHeader = () => {
     breadcrumbItems.push({
       label: "Click-FZT",
       path: "/clickFZT/inicio",
-      icon: <Home sx={{ mr: 1, fill: theme.palette.primary.secondary }} />,
+      icon: <House color={theme.palette.primary.secondary} size={20} />,
     });
 
     // Espacio (si existe spacingId)
@@ -56,7 +56,7 @@ const BreadCrumbsHeader = () => {
       breadcrumbItems.push({
         label: nameSpacing,
         path: `/clickFZT/spacing/${spacingId}`,
-        icon: <Folder sx={{ mr: 1, fill: theme.palette.primary.secondary }} />,
+        icon: <FolderOpen color={theme.palette.primary.secondary} size={20} />,
       });
     }
 
@@ -65,7 +65,7 @@ const BreadCrumbsHeader = () => {
       breadcrumbItems.push({
         label: nameList,
         path: `/clickFZT/spacing/${spacingId}/list/${listId}`,
-        icon: <List sx={{ mr: 1, fill: theme.palette.primary.secondary }} />,
+        icon: <List color={theme.palette.primary.secondary} size={20} />,
       });
     }
 
@@ -92,6 +92,7 @@ const BreadCrumbsHeader = () => {
                 component={Link}
                 to={item.path}
                 sx={{
+                  ml: 1,
                   fontSize: "1rem",
                   textDecoration: "none",
                   color: "black",

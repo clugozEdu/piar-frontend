@@ -13,7 +13,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import { stringAvatar } from "../../../utilities/helpers";
-import Logout from "@mui/icons-material/Logout";
+import { LogOut } from "lucide-react";
 import { logout } from "../../../feactures/auth/redux/login-slice";
 
 function AccountMenu({ userName }) {
@@ -120,7 +120,7 @@ function AccountMenu({ userName }) {
         </MenuItem> */}
         <MenuItem onClick={handleLogout}>
           <ListItemIcon>
-            <Logout fontSize="small" />
+            <LogOut size={20} />
           </ListItemIcon>
           Cerrar Sesión
         </MenuItem>

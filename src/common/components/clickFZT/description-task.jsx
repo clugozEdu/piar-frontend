@@ -1,17 +1,20 @@
 import { useState, useEffect } from "react";
-import PropTypes from "prop-types";
-import { Typography, Box, Menu, Button } from "@mui/material";
-import DescriptionIcon from "@mui/icons-material/Description";
+import { Typography, Box, Menu, Button, IconButton } from "@mui/material";
+import { useTheme } from "@emotion/react";
+import { FileText } from "lucide-react";
 import TextAreaCustom from "./text-area";
-// import { handlerUpdateBD } from "../../../supabaseServices";
-// import useUser from "../../../context/users";
+import { getColorsScheme } from "@/utilities/helpers";
+import { putData } from "@/services/api";
+import PropTypes from "prop-types";
 
-const DescriptionMenuCard = ({ description, taskID }) => {
-  // const { advisorLogin } = useUser();
+const DescriptionMenuCard = ({ task, setShowAlert }) => {
+  const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState(null);
-  const [descriptionTask, setDescriptionTask] = useState(description);
-  const [descriptionTruncate, setDescriptionTruncate] = useState(description);
-  const [tempDescription, setTempDescription] = useState(description);
+  const [descriptionTask, setDescriptionTask] = useState(
+    task.description || ""
+  );
+  const [descriptionTruncate, setDescriptionTruncate] =
+    useState(descriptionTask);
 
   // Actualizar el estado de la descripción truncada
   useEffect(() => {
@@ -25,7 +28,7 @@ const DescriptionMenuCard = ({ description, taskID }) => {
   // Mostrar el menú al hacer clic en el ícono
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
-    setTempDescription(descriptionTask); // Establecer la descripción temporal al abrir el menú
+    setDescriptionTask(task.description || "");
   };
 
   // Cerrar el menú
@@ -35,26 +38,39 @@ const DescriptionMenuCard = ({ description, taskID }) => {
 
   // Guardar los cambios en la descripción
   const handleSaveClick = async () => {
-    setDescriptionTask(tempDescription);
-    console.log(
-      `Descripción actualizada: ${tempDescription} de la tarea ${taskID}`
-    );
-
+    const dataPost = {
+      description: descriptionTask,
+    };
+    await putData(`api/clickup/tasks/${task.id}`, dataPost);
+    setShowAlert(true);
     handleMenuClose();
   };
 
   return (
     <>
       <Box display="flex" alignItems="center">
-        <DescriptionIcon
-          sx={{ mr: 1, color: "text.secondary", cursor: "pointer" }}
+        <IconButton
           onClick={handleMenuClick}
-        />
+          sx={{
+            padding: 0,
+            "&:hover": {
+              backgroundColor: theme.palette.action.hover,
+            },
+            borderRadius: 1,
+          }}
+        >
+          <FileText
+            sixe={20}
+            color={getColorsScheme(task.status.name, theme.palette.statusTask)}
+          />
+        </IconButton>
+
         <Typography
           variant="body1"
           color="text.secondary"
           sx={{
             fontSize: "0.8rem",
+            ml: 1,
           }}
         >
           {descriptionTruncate || "Descripción no disponible"}
@@ -64,13 +80,8 @@ const DescriptionMenuCard = ({ description, taskID }) => {
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
-        sx={{
-          "&:hover": {
-            backgroundColor: "transparent",
-          },
-        }}
       >
-        <Box sx={{ p: 2, maxWidth: 500 }}>
+        <Box sx={{ p: 1, maxWidth: 500 }}>
           <Typography
             variant="h6"
             gutterBottom
@@ -82,13 +93,13 @@ const DescriptionMenuCard = ({ description, taskID }) => {
           </Typography>
           <TextAreaCustom
             minRows={3}
-            value={tempDescription}
-            onChange={(e) => setTempDescription(e.target.value)}
+            value={descriptionTask}
+            onChange={(e) => setDescriptionTask(e.target.value)}
           />
 
           <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
             <Button
-              variant="outlined"
+              variant="contained"
               color="error"
               onClick={handleMenuClose}
               sx={{ mt: 1, mr: 1 }}
@@ -96,9 +107,9 @@ const DescriptionMenuCard = ({ description, taskID }) => {
               Cancelar
             </Button>
             <Button
-              variant="outlined"
+              variant="contained"
               color="primary"
-              onClick={handleSaveClick}
+              onClick={() => handleSaveClick()}
               sx={{ mt: 1 }}
             >
               Guardar
@@ -112,8 +123,9 @@ const DescriptionMenuCard = ({ description, taskID }) => {
 
 // Validar las props del componente
 DescriptionMenuCard.propTypes = {
-  description: PropTypes.string,
-  taskID: PropTypes.string,
+  // description: PropTypes.object,
+  task: PropTypes.object,
+  setShowAlert: PropTypes.func,
 };
 
 export default DescriptionMenuCard;

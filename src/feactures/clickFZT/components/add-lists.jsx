@@ -5,7 +5,8 @@ import {
   CircularProgress,
   Button,
 } from "@mui/material";
-import SaveIcon from "@mui/icons-material/Save";
+import { Save } from "lucide-react";
+
 import * as Yup from "yup";
 import { getData, postData, putData } from "@/services/api";
 import PropTypes from "prop-types";
@@ -118,7 +119,11 @@ const AddList = ({
                   disabled={isSubmitting}
                   onClick={handleSubmit}
                   startIcon={
-                    isSubmitting ? <CircularProgress size={24} /> : <SaveIcon />
+                    isSubmitting ? (
+                      <CircularProgress size={24} />
+                    ) : (
+                      <Save size={20} />
+                    )
                   }
                   sx={{
                     backgroundColor: "#0dac3a",
@@ -127,7 +132,7 @@ const AddList = ({
                     },
                   }}
                 >
-                  {isSubmitting ? "Guardando..." : "Guardar Espacio"}
+                  {isSubmitting ? "Guardando..." : "Guardar Lista"}
                 </Button>
               </DialogActions>
             </>

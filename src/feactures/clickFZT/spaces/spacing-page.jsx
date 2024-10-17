@@ -20,8 +20,10 @@ const SpacingPage = () => {
   const [tasks, setTasks] = useState([]);
   const [lists, setLists] = useState([]);
   const [statusTask, setStatusTask] = useState([]);
+  const [priorityTask, setPriorityTask] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+  const [messageAlert, setMessageAlert] = useState("");
   const { setIsLoading } = useLoading();
   const [filterUsers, setFilterUsers] = useState([]);
   const [currentView, setCurrentView] = useState("dashboard");
@@ -39,6 +41,7 @@ const SpacingPage = () => {
     getData("api/clickup/status").then((data) => {
       setStatusTask(data);
     });
+    getData("api/clickup/priority").then((data) => setPriorityTask(data));
   }, [spacingId, setIsLoading]);
 
   useEffect(() => {
@@ -59,20 +62,19 @@ const SpacingPage = () => {
   }, [spacings]);
 
   useEffect(() => {
-    const event = message[0]?.event;
-    console.log(event);
-
-    if (event == "task_created") {
+    const event = message?.event;
+    console.log("event desde spacingPage", event);
+    if (event) {
       fetchSpacing();
+      setMessageAlert(event);
       setTimeout(() => {
         setIsLoading(false);
       }, 2000);
-      setShowAlert(true);
     }
-  }, [message, fetchSpacing, setIsLoading]);
+  }, [message, fetchSpacing, setIsLoading, spacingId]);
 
   const isTaskOverdue = (dueDate, status_task) => {
-    if (status_task === "Realizado") {
+    if (status_task === "Done") {
       return false;
     }
 
@@ -127,6 +129,8 @@ const SpacingPage = () => {
           stateParent={stateParent}
           parent={stateParent}
           handleAddTask={handleAddTask}
+          setShowAlert={setShowAlert}
+          priorityTask={priorityTask}
         />
       ) : (
         currentView === "list" && (
@@ -134,13 +138,17 @@ const SpacingPage = () => {
             groupedTasks={groupedTasks}
             statusTask={statusTask}
             handleAddTask={handleAddTask}
+            setShowAlert={setShowAlert}
+            priorityTask={priorityTask}
           />
         )
       )}
 
       <CreateDialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
         <AddTask
+          statusTask={statusTask}
           openDialog={isDialogOpen}
+          setShowAlert={setShowAlert}
           setIsDialogOpen={setIsDialogOpen}
           idStatus={statusId}
           lists={lists}
@@ -150,14 +158,20 @@ const SpacingPage = () => {
       {showAlert && (
         <SnackbarMessage
           open={showAlert}
-          message="Tarea creada correctamente"
+          message={
+            messageAlert === "task_created"
+              ? "Tarea creada"
+              : messageAlert === "task_deleted"
+              ? "Tarea eliminada"
+              : "Tarea actualizada"
+          }
           title={"Completado"}
           onCloseHandler={() => {
             setShowAlert(false);
           }}
           duration={3000}
           severity="success"
-          vertical="top"
+          vertical="bottom"
           horizontal="right"
         />
       )}

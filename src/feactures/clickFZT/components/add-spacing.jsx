@@ -11,7 +11,7 @@ import {
   Button,
   CircularProgress,
 } from "@mui/material";
-import SaveIcon from "@mui/icons-material/Save";
+import { Save } from "lucide-react";
 
 const AddSpacing = ({
   openDialog,
@@ -118,7 +118,11 @@ const AddSpacing = ({
                   disabled={isSubmitting}
                   onClick={handleSubmit}
                   startIcon={
-                    isSubmitting ? <CircularProgress size={24} /> : <SaveIcon />
+                    isSubmitting ? (
+                      <CircularProgress size={24} />
+                    ) : (
+                      <Save size={20} />
+                    )
                   }
                   sx={{
                     backgroundColor: "#0dac3a",

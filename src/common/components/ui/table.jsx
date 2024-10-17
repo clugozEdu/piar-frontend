@@ -10,9 +10,9 @@ import {
   TableRow,
 } from "@mui/material";
 import PropTypes from "prop-types";
-export const TableComponent = ({ columns, rows, keys }) => {
+export const TableComponent = ({ columns, rows, keys, rowsPage }) => {
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(rowsPage ? rowsPage : 10);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -65,6 +65,7 @@ TableComponent.propTypes = {
   columns: PropTypes.array.isRequired,
   rows: PropTypes.array.isRequired,
   keys: PropTypes.array.isRequired,
+  rowsPage: PropTypes.number,
 };
 
 export default TableComponent;

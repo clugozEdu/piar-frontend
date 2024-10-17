@@ -1,37 +1,20 @@
 import { useEffect, useState } from "react";
+import { Box, Menu, MenuItem, IconButton } from "@mui/material";
+import { useTheme } from "@emotion/react";
+import { ArrowRightLeft } from "lucide-react";
+import { getColorsScheme } from "@/utilities/helpers";
+import { putData } from "@/services/api";
 import PropTypes from "prop-types";
-import { Menu, MenuItem, IconButton } from "@mui/material";
-import SyncAltIcon from "@mui/icons-material/SyncAlt";
-// import { handlerUpdateBD } from "../../../supabaseServices";
-// import useUser from "../../../context/users";
-``;
-const initialItemsMenu = [
-  {
-    id: "aaa27da1-0c16-4cf5-adde-bf0144c538e8",
-    label: "Backlog",
-  },
-  {
-    id: "c5171577-dc5c-4350-9f9b-38a96f1212a1",
-    label: "Doing",
-  },
-  {
-    id: "5a7ee6b5-d2e1-4772-bc22-601bf576deae",
-    label: "Done",
-  },
-];
 
-const MenuCards = ({ taskId, idStatus }) => {
-  // const { advisorLogin } = useUser();
-
+const MenuCards = ({ task, statusTask, setShowAlert }) => {
   const [itemsMenu, setItemsMenu] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
+  const theme = useTheme();
 
   // filter data from menu
   useEffect(() => {
-    if (idStatus) {
-      setItemsMenu(initialItemsMenu.filter((item) => item.id !== idStatus));
-    }
-  }, [idStatus]);
+    setItemsMenu(statusTask?.filter((item) => item.id !== task.status.id));
+  }, [task.status.id, statusTask]);
 
   const handleMenuClick = (event) => {
     event.preventDefault();
@@ -42,22 +25,39 @@ const MenuCards = ({ taskId, idStatus }) => {
     setAnchorEl(null);
   };
 
-  const onClickHandler = (e) => {
-    console.log(`Tarea ${taskId} movida a ${e.currentTarget.id}`);
+  const onClickHandler = async (e) => {
+    const dataPost = {
+      status_id: e.currentTarget.id,
+    };
+    await putData(`api/clickup/tasks/${task.id}`, dataPost);
+    setShowAlert(true);
     handleMenuClose();
   };
 
   return (
-    <>
+    <Box
+      display="flex"
+      sx={{
+        alignItems: "center",
+        pl: 1,
+      }}
+    >
       <IconButton
         onClick={(event) => {
           handleMenuClick(event);
         }}
         sx={{
           padding: "0px 0px 0px 0px",
+          "&:hover": {
+            backgroundColor: theme.palette.action.hover,
+          },
+          borderRadius: 1,
         }}
       >
-        <SyncAltIcon />
+        <ArrowRightLeft
+          size={20}
+          color={getColorsScheme(task.status.name, theme.palette.statusTask)}
+        />
       </IconButton>
       <Menu
         id="menu"
@@ -65,7 +65,7 @@ const MenuCards = ({ taskId, idStatus }) => {
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
       >
-        {itemsMenu.map((item, index) => (
+        {itemsMenu?.map((item, index) => (
           <MenuItem
             key={index}
             id={item.id}
@@ -73,17 +73,19 @@ const MenuCards = ({ taskId, idStatus }) => {
               onClickHandler(e);
             }}
           >
-            {item.label}
+            {item.name}
           </MenuItem>
         ))}
       </Menu>
-    </>
+    </Box>
   );
 };
 
 MenuCards.propTypes = {
-  idStatus: PropTypes.string,
-  taskId: PropTypes.string,
+  // idStatus: PropTypes.string,
+  task: PropTypes.object,
+  statusTask: PropTypes.array,
+  setShowAlert: PropTypes.func,
 };
 
 export default MenuCards;

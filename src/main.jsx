@@ -37,10 +37,18 @@ const theme = createTheme({
       selected: "#f0f4f8",
       hover: "#e3e8ec",
     },
+    chipStatus: {
+      Backlog: "rgba(0, 0, 139, 0.5)",
+      Doing: "rgba(70, 130, 180, 0.5)",
+      Done: "rgba(0, 128, 0, 0.5)",
+    },
     statusTask: {
       Backlog: "#0d1f2d",
       Doing: "#1f3b5a",
       Done: "#578e22",
+    },
+    overTask: {
+      main: "#f44336",
     },
     priorityTask: {
       Alta: "#cf940a",
@@ -61,10 +69,8 @@ const theme = createTheme({
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <ThemeProvider theme={theme}>
-      {/* Wrap the RouterProvider with the Provider */}
       <LoadingProvider>
         <Provider store={store}>
-          {/* Pass the router to the RouterProvider */}
           <RouterProvider router={router} />
         </Provider>
       </LoadingProvider>

@@ -111,6 +111,7 @@ const AppBarSite = ({ advisor }) => {
             boxShadow: 3,
             borderRadius: 2,
             // border: "1px solid #ffffff",
+            scrollbarWidth: "none",
           }}
           id="box-outlet-main"
         >
@@ -137,7 +138,10 @@ const AppBarSite = ({ advisor }) => {
 
           {/** Box to Outlet of the App */}
           <Box
-            sx={{ flexGrow: 1, padding: "0px 20px 0px 20px" }}
+            sx={{
+              flexGrow: 1,
+              padding: "0px 20px 0px 20px",
+            }}
             id="box-oulet"
           >
             {/** Component Outlet

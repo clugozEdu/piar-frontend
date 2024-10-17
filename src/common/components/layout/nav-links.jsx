@@ -1,10 +1,4 @@
-// import AssignmentIcon from "@mui/icons-material/Assignment";
-// import ModeOfTravelIcon from "@mui/icons-material/ModeOfTravel";
-import Home from "@mui/icons-material/Home";
-// import AppRegistrationIcon from "@mui/icons-material/AppRegistration";
-import AdsClickIcon from "@mui/icons-material/AdsClick";
-// import AssignmentIcon from "@mui/icons-material/Assignment";
-import SchoolIcon from "@mui/icons-material/School";
+import { House, ListTodo, School } from "lucide-react";
 
 /** Nav Links array
  * @type {Array}
@@ -20,7 +14,7 @@ const navLinks = [
   {
     id: "home",
     name: "Inicio",
-    icon: <Home />,
+    icon: <House size={24} color={"#FFFFFF"} />,
     path: "/home/inicio",
     children: [],
   },
@@ -28,7 +22,7 @@ const navLinks = [
   /** Item to menu schools */ {
     id: "schools",
     name: "Inicio",
-    icon: <Home sx={{ fill: "#0d1f2d" }} />,
+    icon: <House size={24} color={"#FFFFFF"} />,
     path: "/schools/inicio",
     children: [],
   },
@@ -45,19 +39,19 @@ const menuIconsBar = [
   {
     id: "home",
     name: "Inicio",
-    icon: <Home />,
+    icon: <House size={24} />,
     path: "/home",
   },
   {
     id: "clickFZT",
     name: "Click FZT",
-    icon: <AdsClickIcon />,
+    icon: <ListTodo size={24} />,
     path: "/clickFZT",
   },
   {
     id: "schools",
     name: "Escuelas",
-    icon: <SchoolIcon />,
+    icon: <School size={24} />,
     path: "/schools",
   },
 ];

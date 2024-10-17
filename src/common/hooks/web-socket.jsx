@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 
 /** Hook useWebSocket
  * Hook to manage a WebSocket connection
- * @return {array} messages
+ * @return {object} message
  */
 const useWebSocket = () => {
   /** Init state the hook */
-  const [messages, setMessages] = useState([]);
+  const [message, setMessage] = useState(null);
   const token = localStorage.getItem("token-advisor");
 
   /** UseEffect to manage the WebSocket connection
@@ -35,11 +35,17 @@ const useWebSocket = () => {
     /** WebSocket message received
      * @param {object} event - Event object with the data received
      * @param {string} event.data - Data received from the WebSocket
-     * @return setMessages - Set the messages in the state
+     * @return setMessage - Set the current message in the state
      */
     ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      setMessages((prevMessages) => [...prevMessages, data]);
+      try {
+        const data = JSON.parse(event.data);
+
+        // Set the current message to the latest one received
+        setMessage(data);
+      } catch (error) {
+        console.error("Error parsing WebSocket message: ", error);
+      }
     };
 
     /** WebSocket connection closed */
@@ -47,13 +53,15 @@ const useWebSocket = () => {
       console.log("WebSocket connection closed.");
     };
 
+    /** Cleanup function to close WebSocket connection */
     return () => {
       if (ws) {
         ws.close();
       }
     };
   }, [token]);
-  return messages;
+
+  return message;
 };
 
 export default useWebSocket;

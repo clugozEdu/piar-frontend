@@ -18,8 +18,7 @@ import Grid from "@mui/material/Grid2";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchLogin } from "../redux/login-slice";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { Eye, EyeOff } from "lucide-react";
 import Copyright from "../components/copy-right";
 import "./login.css";
 
@@ -171,7 +170,7 @@ const SignIn = () => {
                       onClick={() => setShowPassword(!showPassword)}
                       edge="end"
                     >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                      {showPassword ? <Eye size={24} /> : <EyeOff size={24} />}
                     </IconButton>
                   </InputAdornment>
                 ),

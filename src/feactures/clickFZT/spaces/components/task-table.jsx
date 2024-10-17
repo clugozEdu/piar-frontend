@@ -2,9 +2,7 @@ import { Avatar, Tooltip } from "@mui/material";
 import PropTypes from "prop-types";
 import { Link, useParams } from "react-router-dom";
 import TableComponent from "@/common/components/ui/table";
-import { stringAvatar } from "@/utilities/helpers";
-import DateMenuCard from "@/common/components/clickFZT/date-menu";
-import TimeMenu from "@/common/components/clickFZT/time-menu";
+import { stringAvatar, formatDate, convertHours } from "@/utilities/helpers";
 
 const TableTask = ({ tasks }) => {
   const { spacingId } = useParams();
@@ -31,21 +29,24 @@ const TableTask = ({ tasks }) => {
           {task.title}
         </Link>
       ),
-      start_date: (
-        <DateMenuCard
-          date={task.start_date}
-          taskID={task.id}
-          keyUpdate={"start_date"}
-        />
-      ),
-      end_date: (
-        <DateMenuCard
-          date={task.end_date}
-          taskID={task.id}
-          keyUpdate={"end_date"}
-        />
-      ),
-      time_task: <TimeMenu task={task} />,
+      start_date: formatDate(task.start_date),
+      // start_date: (
+      //   <DateMenuCard
+      //     date={task.start_date}
+      //     taskID={task.id}
+      //     keyUpdate={"start_date"}
+      //   />
+      // ),
+      end_date: formatDate(task.end_date),
+      // end_date: (
+      //   <DateMenuCard
+      //     date={task.end_date}
+      //     taskID={task.id}
+      //     keyUpdate={"end_date"}
+      //   />
+      // ),
+      time_task: `${convertHours(task.time_task)} hrs`,
+      // time_task: <TimeMenu task={task} />,
       status: task.status.name,
       responsable: (
         <Tooltip title={responsibleUser}>
@@ -63,6 +64,7 @@ const TableTask = ({ tasks }) => {
       columns={columns}
       rows={tasks.map(transformRow)}
       keys={columns.map((column) => column.id)}
+      rowsPage={6}
     />
   );
 };

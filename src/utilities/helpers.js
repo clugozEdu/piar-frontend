@@ -21,10 +21,13 @@ const stringToColor = (string) => {
 };
 
 // function to callback stringColor for return avatar user and color
-export const stringAvatar = (name) => {
+export const stringAvatar = (name, height, width, sizeFont) => {
   return {
     sx: {
       bgcolor: stringToColor(name),
+      maxWidth: width ? width : 50,
+      maxHeight: height ? height : 50,
+      fontSize: sizeFont ? sizeFont : 20,
     },
     children: `${name.split(" ")[0][0]}${name.split(" ")[1][0]}`,
   };

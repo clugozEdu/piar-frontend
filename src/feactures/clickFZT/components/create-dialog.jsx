@@ -5,7 +5,7 @@ import {
   IconButton,
   Box,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+import { CircleX } from "lucide-react";
 import LoadingGLobal from "@/common/components/ui/loading-global";
 import PropTypes from "prop-types";
 
@@ -36,7 +36,7 @@ const CreateDialog = ({ open, onClose, children, title, isLoading }) => {
           color: theme.palette.grey[500],
         })}
       >
-        <CloseIcon />
+        <CircleX size={24} />
       </IconButton>
 
       <DialogContent dividers sx={dialogContentStyle}>

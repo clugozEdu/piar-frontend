@@ -2,17 +2,19 @@ import { useState } from "react";
 import {
   Card,
   CardContent,
-  Chip,
   Box,
   IconButton,
   Tooltip,
   Avatar,
   Divider,
+  Typography,
+  CardHeader,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
+// import { Link, useParams } from "react-router-dom";
+
 import { useTheme } from "@emotion/react";
-import EventBusyIcon from "@mui/icons-material/EventBusy";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { Trash2, CircleUser } from "lucide-react";
 import PropTypes from "prop-types";
 import { getColorsScheme, stringAvatar } from "@/utilities/helpers";
 import MenuCards from "@/common/components/clickFZT/menu-card-task";
@@ -23,7 +25,14 @@ import DateMenuCard from "@/common/components/clickFZT/date-menu";
 import DescriptionMenuCard from "@/common/components/clickFZT/description-task";
 import ConfirmDeleteItems from "../../components/delete-items";
 
-const TaskCard = ({ task, isOverdue }) => {
+const TaskCard = ({
+  task,
+  isOverdue,
+  statusTask,
+  setShowAlert,
+  priorityTask,
+}) => {
+  // const { spacingId } = useParams();
   const [taskDelete, setTaskDelete] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const userName = `${task.owner_advisor.first_name} ${task.owner_advisor.last_name}`;
@@ -41,10 +50,20 @@ const TaskCard = ({ task, isOverdue }) => {
         sx={{
           maxHeight: 400,
           borderRadius: 2,
-          // boxShadow: 2,
+          boxShadow: 2,
           marginBottom: 2,
         }}
       >
+        {isOverdue && (
+          <CardHeader
+            sx={{
+              padding: 0,
+              maxHeight: 5,
+              minHeight: 5,
+              backgroundColor: theme.palette.overTask.main,
+            }}
+          />
+        )}
         <CardContent>
           <Grid container spacing={1}>
             {/* Encabezado: Título y botones */}
@@ -55,19 +74,35 @@ const TaskCard = ({ task, isOverdue }) => {
               alignItems="center"
             >
               {/* Nombre de la tarea */}
-              <TitleMenu task={task} />
-
-              {/* Botones */}
+              <TitleMenu task={task} setShowAlert={setShowAlert} />
+              {/* Botones Delete y Mover Tarea */}
               <Box display="flex">
                 <IconButton
                   sx={{
-                    padding: "0px 10px 0px 0px",
+                    padding: 0,
+                    "&:hover": {
+                      backgroundColor: theme.palette.action.hover,
+                    },
+                    borderRadius: 1,
                   }}
                   onClick={handlerDeleteTask}
+                  // disableRipple={true}
                 >
-                  <DeleteIcon />
+                  <Trash2
+                    size={20}
+                    color={getColorsScheme(
+                      task.status.name,
+                      theme.palette.statusTask
+                    )}
+                  />
                 </IconButton>
-                <MenuCards idStatus={task.status.id} taskId={task.id} />
+                {/* Menú de opciones para mover la tarea */}
+                <MenuCards
+                  // idStatus={task.status.id}
+                  task={task}
+                  statusTask={statusTask}
+                  setShowAlert={setShowAlert}
+                />
               </Box>
             </Grid>
 
@@ -75,53 +110,64 @@ const TaskCard = ({ task, isOverdue }) => {
               <Divider />
             </Grid>
 
-            {/* Descripción de la tarea */}
-            <Grid size={{ xs: 12, sm: 8 }}>
-              <DescriptionMenuCard
-                description={task.description}
-                taskID={task.id}
-              />
+            <Grid size={{ xs: 12, sm: 12 }}>
+              <Typography
+                variant="body2"
+                color="textSecondary"
+                // component={Link}
+                // to={`clickFZT/spacing/${spacingId}/list/${task.list_id}`}
+              >
+                {`En ${task.list_title}`}
+              </Typography>
             </Grid>
 
-            <Grid size={{ xs: 12, sm: 4 }}>
-              <Chip label={`En ${task.list_title}`} />
+            {/* Descripción de la tarea */}
+            <Grid size={{ xs: 12, sm: 12 }}>
+              <DescriptionMenuCard
+                task={task}
+                // taskID={task.id}
+                setShowAlert={setShowAlert}
+              />
             </Grid>
 
             {/* Fechas de inicio y fin */}
             <Grid size={{ xs: 12, sm: 6 }}>
               <DateMenuCard
-                date={task.start_date}
+                task={task}
+                // date={task.start_date}
                 text={"Inicio: "}
-                taskID={task.id}
+                // taskID={task.id}
                 keyUpdate={"start_date"}
+                setShowAlert={setShowAlert}
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
               <DateMenuCard
-                date={task.end_date}
+                task={task}
+                // date={task.end_date}
                 text={"Fin: "}
-                taskID={task.id}
+                // taskID={task.id}
                 keyUpdate={"end_date"}
+                setShowAlert={setShowAlert}
               />
             </Grid>
 
             {/* Tiempo dedicado a la tarea */}
             <Grid size={{ xs: 12 }}>
-              <TimeMenu task={task} />
+              <TimeMenu task={task} setShowAlert={setShowAlert} />
             </Grid>
 
             {/* Información de estado, prioridad y usuario */}
-            <Grid
-              size={{ xs: 12 }}
-              display="flex"
-              alignItems="center"
-              justifyContent={"flex-end"}
-              flexWrap="wrap"
-            >
+            <Grid size={{ xs: 12 }}>
               {/* Prioridad */}
-              <PriorityChip priority={task.priority} idTask={task.id} />
+              <PriorityChip
+                priorityTask={priorityTask}
+                priority={task.priority}
+                task={task}
+                setShowAlert={setShowAlert}
+              />
               {/* Tarea atrasada */}
-              {isOverdue && (
+              {/* {isOverdue && (
                 <Chip
                   label="Atrasada"
                   icon={
@@ -133,42 +179,58 @@ const TaskCard = ({ task, isOverdue }) => {
                   }
                   sx={{
                     backgroundColor: "transparent",
+                    borderRadius: 0,
                   }}
                 />
-              )}
+              )} */}
               {/* Estado de la tarea */}
-              <Chip
+              {/* <Chip
                 label={task.status.name}
+                // variant="outlined"
                 sx={{
                   backgroundColor: getColorsScheme(
                     task.status.name,
-                    theme.palette.statusTask
+                    theme.palette.chipStatus
                   ),
                   color: "white",
                   marginRight: 1,
-                }}
-              />
-
-              {/* Avatar del usuario */}
-              <Tooltip title={userName}>
-                <Avatar
-                  sx={{
-                    width: 32,
-                    height: 32,
-                    marginRight: 1,
-                  }}
-                  {...stringAvatar(userName)}
-                />
-              </Tooltip>
-
-              {/* Nombre de la lista */}
-              {/* <Chip
-                label={task.lists.title}
-                sx={{
-                  backgroundColor: "transparent",
-                  color: "black",
+                  padding: 0,
+                  borderRadius: 1,
                 }}
               /> */}
+            </Grid>
+
+            {/* Usuario asignado a la tarea */}
+            <Grid size={{ xs: 12 }}>
+              <Box display="flex" alignItems="center">
+                <IconButton
+                  sx={{
+                    padding: 0,
+                    "&:hover": {
+                      backgroundColor: theme.palette.action.hover,
+                    },
+                    borderRadius: 1,
+                  }}
+                >
+                  <CircleUser
+                    size={24}
+                    color={getColorsScheme(
+                      task.status.name,
+                      theme.palette.statusTask
+                    )}
+                  />
+                </IconButton>
+                <Box
+                  sx={{
+                    marginLeft: 1,
+                  }}
+                >
+                  {/* Avatar del usuario */}
+                  <Tooltip title={userName}>
+                    <Avatar {...stringAvatar(userName, 25, 25, "0.8rem")} />
+                  </Tooltip>
+                </Box>
+              </Box>
             </Grid>
           </Grid>
         </CardContent>
@@ -190,6 +252,9 @@ const TaskCard = ({ task, isOverdue }) => {
 TaskCard.propTypes = {
   task: PropTypes.object.isRequired,
   isOverdue: PropTypes.bool,
+  statusTask: PropTypes.array,
+  setShowAlert: PropTypes.func,
+  priorityTask: PropTypes.array,
 };
 
 export default TaskCard;

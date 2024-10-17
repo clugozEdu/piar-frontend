@@ -11,21 +11,22 @@ import {
 import { useTheme } from "@mui/material";
 import { Link, useParams } from "react-router-dom";
 import {
-  ExpandLess,
-  ExpandMore,
   Folder,
   FolderOpen,
-  MoreVert,
-  Delete,
-} from "@mui/icons-material";
-import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
-import EditIcon from "@mui/icons-material/Edit";
+  ChevronDown,
+  ChevronUp,
+  Ellipsis,
+  ListCollapse,
+  Pencil,
+  ListX,
+} from "lucide-react";
+
 import PropTypes from "prop-types";
 import ConfirmDeleteItems from "../delete-items";
 import AddList from "../add-lists";
 import SnackbarMessage from "@/common/components/ui/snackbar";
 
-const SpacingsList = ({
+const SpacingSideClickFZT = ({
   spacings,
   open,
   handleClick,
@@ -104,7 +105,7 @@ const SpacingsList = ({
             <div
               key={spacing.id}
               style={{
-                marginBottom: 12,
+                marginBottom: "10px",
                 boxShadow: open[spacing.id]
                   ? "0px 0px 4px rgba(0, 0, 0, 0.1)"
                   : "none",
@@ -114,11 +115,11 @@ const SpacingsList = ({
               {/* Render Items */}
               <ListItemButton
                 id="spacing-item-button"
-                component={Link}
-                to={`clickFZT/spacing/${spacing.id}`}
+                component={spacing.isOwner ? Link : "div"}
+                to={spacing.isOwner ? `clickFZT/spacing/${spacing.id}` : "#"}
                 sx={{
                   padding: 0.5,
-                  mb: open[spacing.id] ? 0 : 1,
+                  mb: open[spacing.id] ? 0.5 : 0.5,
                   borderRadius: open[spacing.id] ? "5px 5px 0 0" : 5,
                   backgroundColor:
                     open[spacing.id] || spacingId === spacing.id
@@ -132,9 +133,9 @@ const SpacingsList = ({
               >
                 {/* Folder Icon */}
                 {open[spacing.id] ? (
-                  <FolderOpen sx={{ fill: theme.palette.primary.main }} />
+                  <FolderOpen size={24} color={theme.palette.secondary.main} />
                 ) : (
-                  <Folder sx={{ fill: theme.palette.secondary.main }} />
+                  <Folder size={24} color={theme.palette.secondary.main} />
                 )}
                 {/* Spacing Name */}
                 <ListItemText primary={spacing.title} sx={{ pl: 0.5 }} />
@@ -153,9 +154,12 @@ const SpacingsList = ({
                   }}
                 >
                   {open[spacing.id] ? (
-                    <ExpandLess sx={{ fill: theme.palette.primary.main }} />
+                    <ChevronUp size={20} color={theme.palette.secondary.main} />
                   ) : (
-                    <ExpandMore sx={{ fill: theme.palette.secondary.main }} />
+                    <ChevronDown
+                      size={20}
+                      color={theme.palette.secondary.main}
+                    />
                   )}
                 </IconButton>
 
@@ -172,12 +176,7 @@ const SpacingsList = ({
                     },
                   }}
                 >
-                  <MoreVert
-                    sx={{
-                      fill: theme.palette.primary.main,
-                      transform: "rotate(90deg)",
-                    }}
-                  />
+                  <Ellipsis size={20} color={theme.palette.primary.main} />
                 </IconButton>
               </ListItemButton>
 
@@ -216,11 +215,13 @@ const SpacingsList = ({
                         },
                       }}
                     >
-                      <FormatListBulletedIcon
-                        sx={{ fill: theme.palette.primary.secondary }}
+                      <ListCollapse
+                        size={18}
+                        color={theme.palette.primary.secondary}
                       />
                       {/* List Name */}
                       <ListItemText sx={{ pl: 1 }} primary={list.title} />
+
                       {/* Edit/Delete Buttons if owner */}
                       {list.isOwner || spacing.isOwner ? (
                         <>
@@ -245,8 +246,9 @@ const SpacingsList = ({
                                   },
                                 }}
                               >
-                                <EditIcon
-                                  sx={{ fill: theme.palette.primary.secondary }}
+                                <Pencil
+                                  size={18}
+                                  color={theme.palette.primary.secondary}
                                 />
                               </IconButton>
                             </Tooltip>
@@ -266,8 +268,9 @@ const SpacingsList = ({
                                   },
                                 }}
                               >
-                                <Delete
-                                  sx={{ fill: theme.palette.primary.secondary }}
+                                <ListX
+                                  size={18}
+                                  color={theme.palette.primary.secondary}
                                 />
                               </IconButton>
                             </Tooltip>
@@ -285,7 +288,7 @@ const SpacingsList = ({
   );
 };
 
-SpacingsList.propTypes = {
+SpacingSideClickFZT.propTypes = {
   spacings: PropTypes.array.isRequired,
   open: PropTypes.object.isRequired,
   handleClick: PropTypes.func.isRequired,
@@ -293,4 +296,4 @@ SpacingsList.propTypes = {
   context: PropTypes.string,
 };
 
-export default SpacingsList;
+export default SpacingSideClickFZT;

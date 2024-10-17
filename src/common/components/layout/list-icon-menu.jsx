@@ -55,7 +55,7 @@ const ListIconsMenu = ({ arrayMenu, selectedMenu, setSelectedMenu }) => {
               sx={{
                 minWidth: "auto",
                 "& svg": {
-                  fill: isSelected(item.id)
+                  color: isSelected(item.id)
                     ? theme.palette.drawer.selected
                     : "#ffffff",
                 },

@@ -9,12 +9,19 @@ import {
   Typography,
   Divider,
   Tooltip,
+  IconButton,
 } from "@mui/material";
 import { useTheme } from "@emotion/react";
-import { CreateNewFolder, Home, Add, Delete } from "@mui/icons-material";
-import FolderSpecialIcon from "@mui/icons-material/FolderSpecial";
-import FolderSharedIcon from "@mui/icons-material/FolderShared";
-import EditIcon from "@mui/icons-material/Edit";
+import {
+  House,
+  Pencil,
+  FolderHeart,
+  FolderPlus,
+  Share2,
+  ListPlus,
+  FolderMinus,
+} from "lucide-react";
+
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import { getData } from "@/services/api";
@@ -22,7 +29,7 @@ import CreateDialog from "../create-dialog";
 import AddSpacing from "../add-spacing";
 import AddList from "../add-lists";
 import ConfirmDeleteItems from "../delete-items";
-import SpacingsList from "./spacing-side-click-fzt";
+import SpacingSideClickFZT from "./spacing-side-click-fzt";
 import SnackbarMessage from "@/common/components/ui/snackbar";
 import useWebSocket from "@/common/hooks/web-socket";
 import useLoading from "@/common/hooks/calllbacks/loading";
@@ -42,6 +49,7 @@ const ListSideClickFZT = ({ advisorLogin }) => {
   const [selectedSpacing, setSelectedSpacing] = useState(null);
   const [contextDialog, setContextDialog] = useState("");
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [messageAlert, setMessageAlert] = useState("");
   const { setIsLoading } = useLoading();
   const [showAlert, setShowAlert] = useState(false);
   const message = useWebSocket();
@@ -59,7 +67,7 @@ const ListSideClickFZT = ({ advisorLogin }) => {
    *
    */
   const fetchSpacings = useCallback(() => {
-    setIsLoading(true);
+    // setIsLoading(true);
     getData(`api/clickup/spacing/advisor/`).then((data) => {
       /** Add isOwner to spacing and list */
       const updatedSpacings = data.map((spacing) => ({
@@ -73,7 +81,7 @@ const ListSideClickFZT = ({ advisorLogin }) => {
 
       setSpacings(updatedSpacings);
     });
-  }, [advisorLogin.id, setIsLoading]);
+  }, [advisorLogin.id]);
 
   /** UseEffect to fetchSpacing when the component is mounted
    * fetchSpacings: function to fetch spacings
@@ -82,9 +90,10 @@ const ListSideClickFZT = ({ advisorLogin }) => {
    */
   useEffect(() => {
     fetchSpacings();
+    setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
-    }, 2000);
+    }, 1500);
   }, [fetchSpacings, setIsLoading]);
 
   /** UseEffect to read message to webSocket
@@ -94,13 +103,13 @@ const ListSideClickFZT = ({ advisorLogin }) => {
    * dependecies: message, fetchSpacings
    */
   useEffect(() => {
-    const event = message[0]?.event;
-    if (event) {
+    if (message?.event) {
+      setMessageAlert(message.event);
       fetchSpacings();
     }
     setTimeout(() => {
       setIsLoading(false);
-    }, 2000);
+    }, 1500);
   }, [message, fetchSpacings, setIsLoading]);
 
   /** Handle to open and close item list
@@ -180,7 +189,6 @@ const ListSideClickFZT = ({ advisorLogin }) => {
    * @returns {true} handleMenuClose - close menu
    */
   const handleCreateList = () => {
-    console.log(selectedSpacing);
     handleMenuClose(false);
     setContextDialog("createList");
     setIsDialogOpen(true);
@@ -247,16 +255,13 @@ const ListSideClickFZT = ({ advisorLogin }) => {
             borderRadius: 5,
           }}
         >
-          <Home
-            sx={{
-              fill: theme.palette.primary.main,
-            }}
-          />
+          <House size={22} color={theme.palette.primary.main} />
           <ListItemText sx={{ pl: 1 }} primary="Inicio" />
         </ListItemButton>
 
         {/* Render title Mis Espacios */}
         <Box
+          id="box-title-spacings"
           sx={{
             display: "flex",
             justifyContent: "start",
@@ -264,11 +269,7 @@ const ListSideClickFZT = ({ advisorLogin }) => {
             mt: 1,
           }}
         >
-          <FolderSpecialIcon
-            sx={{
-              fill: theme.palette.primary.main,
-            }}
-          />
+          <FolderHeart size={22} color={theme.palette.primary.main} />
           <Typography
             variant="body1"
             sx={{
@@ -282,20 +283,25 @@ const ListSideClickFZT = ({ advisorLogin }) => {
           </Typography>
 
           <Tooltip title={"Crear Espacio"}>
-            <CreateNewFolder
+            <IconButton
               sx={{
-                fill: theme.palette.primary.main,
+                padding: 1,
+                borderRadius: 1,
                 ml: "auto",
+                "&:hover": {
+                  backgroundColor: theme.palette.action.hover,
+                },
               }}
               onClick={handleCreateSpacing}
-            />
+            >
+              <FolderPlus size={22} color={theme.palette.primary.main} />
+            </IconButton>
           </Tooltip>
         </Box>
 
         <Divider
           sx={{
             m: 1,
-            // background: theme.palette.secondary.main,
           }}
         />
 
@@ -306,7 +312,7 @@ const ListSideClickFZT = ({ advisorLogin }) => {
          * @param {func} handleMenuClick - Function to open menu
          * @param {boolean} isResponsible - Boolean to check if the advisor is responsible
          */}
-        <SpacingsList
+        <SpacingSideClickFZT
           spacings={spacings}
           open={open}
           handleClick={handleClick}
@@ -322,11 +328,7 @@ const ListSideClickFZT = ({ advisorLogin }) => {
             alignItems: "center",
           }}
         >
-          <FolderSharedIcon
-            sx={{
-              fill: theme.palette.primary.main,
-            }}
-          />
+          <Share2 size={22} color={theme.palette.primary.main} />
           <Typography
             sx={{
               mt: 0,
@@ -346,7 +348,7 @@ const ListSideClickFZT = ({ advisorLogin }) => {
           }}
         />
 
-        <SpacingsList
+        <SpacingSideClickFZT
           spacings={spacings}
           open={open}
           handleClick={handleClick}
@@ -370,39 +372,52 @@ const ListSideClickFZT = ({ advisorLogin }) => {
           flexDirection={"column"}
           justifyContent={"space-between"}
         >
+          {/* Render menu add list */}
+          <MenuItem onClick={handleCreateList}>
+            <Box
+              display={"flex"}
+              alignContent={"center"}
+              sx={{
+                pr: 2,
+              }}
+            >
+              <ListPlus size={20} color={theme.palette.primary.secondary} />
+            </Box>
+            Agregar Lista
+          </MenuItem>
           {/* Render menu edit spacing only if owner */}
           {selectedSpacing &&
             spacings.find((s) => s.id === selectedSpacing)?.isOwner && (
               <MenuItem onClick={handleEditSpacing}>
-                <EditIcon
+                <Box
+                  display={"flex"}
+                  alignContent={"center"}
                   sx={{
-                    mr: 2,
-                    fill: theme.palette.primary.secondary,
+                    pr: 2,
                   }}
-                />
+                >
+                  <Pencil size={20} color={theme.palette.primary.secondary} />
+                </Box>
                 Editar Espacio
               </MenuItem>
             )}
-          {/* Render menu add list */}
-          <MenuItem onClick={handleCreateList}>
-            <Add
-              sx={{
-                mr: 2,
-                fill: theme.palette.primary.secondary,
-              }}
-            />
-            Agregar Lista
-          </MenuItem>
+
           {/* Render menu delete spacing only if owner */}
           {selectedSpacing &&
             spacings.find((s) => s.id === selectedSpacing)?.isOwner && (
               <MenuItem onClick={handleDeleteClick}>
-                <Delete
+                <Box
+                  display={"flex"}
+                  alignContent={"center"}
                   sx={{
-                    mr: 2,
-                    fill: theme.palette.primary.secondary,
+                    pr: 2,
                   }}
-                />
+                >
+                  <FolderMinus
+                    size={20}
+                    color={theme.palette.primary.secondary}
+                  />
+                </Box>
                 Eliminar Espacio
               </MenuItem>
             )}
@@ -429,10 +444,21 @@ const ListSideClickFZT = ({ advisorLogin }) => {
       {showAlert && (
         <SnackbarMessage
           open={showAlert}
-          message="Espacio creado correctamente"
+          message={
+            messageAlert === "spacing_created"
+              ? "Espacio creado con éxito"
+              : messageAlert === "spacing_deleted"
+              ? "Espacio eliminado con éxito"
+              : messageAlert === "spacing_updated"
+              ? "Espacio actualizado con éxito"
+              : messageAlert === "list_created"
+              ? "Lista creada con éxito"
+              : ""
+          }
           title={"Completado"}
           onCloseHandler={() => {
             setShowAlert(false);
+            setMessageAlert("");
           }}
           duration={3000}
           severity="success"

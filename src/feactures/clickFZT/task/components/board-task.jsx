@@ -1,7 +1,7 @@
 import { Box, Chip, Typography, IconButton } from "@mui/material";
 import { useTheme } from "@emotion/react";
 import Grid from "@mui/material/Grid2";
-import AddIcon from "@mui/icons-material/Add";
+import { CirclePlus } from "lucide-react";
 import TaskCard from "./card-task";
 import { getColorsScheme } from "@/utilities/helpers";
 
@@ -13,6 +13,8 @@ const BoardTask = ({
   stateParent,
   parent,
   handleAddTask,
+  setShowAlert,
+  priorityTask,
 }) => {
   const theme = useTheme();
   return (
@@ -71,7 +73,7 @@ const BoardTask = ({
                         fontSize: "1rem",
                       }}
                     >
-                      ({groupedTasks[status.name]?.length || 0})
+                      {groupedTasks[status.name]?.length || 0}
                     </Typography>
                   }
                   sx={{
@@ -85,11 +87,7 @@ const BoardTask = ({
                   }}
                   onClick={() => handleAddTask(status.id)}
                 >
-                  <AddIcon
-                    sx={{
-                      fill: "white",
-                    }}
-                  />
+                  <CirclePlus color="white" size={24} />
                 </IconButton>
               </Box>
             </Box>
@@ -110,10 +108,12 @@ const BoardTask = ({
           >
             {groupedTasks[status.name]?.map((task) => (
               <TaskCard
+                statusTask={statusTask}
                 key={task.id}
                 task={task}
                 isOverdue={task.overdue}
-                // setChangeBD={setChangeBD}
+                setShowAlert={setShowAlert}
+                priorityTask={priorityTask}
               />
             ))}
           </Grid>
@@ -129,6 +129,8 @@ BoardTask.propTypes = {
   stateParent: PropTypes.func.isRequired,
   statusTask: PropTypes.array.isRequired,
   handleAddTask: PropTypes.func.isRequired,
+  priorityTask: PropTypes.array.isRequired,
+  setShowAlert: PropTypes.func,
 };
 
 export default BoardTask;

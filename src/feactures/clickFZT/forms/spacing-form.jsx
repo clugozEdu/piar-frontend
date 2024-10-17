@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import Grid from "@mui/material/Grid2";
-import { Person } from "@mui/icons-material";
+import { CircleUser } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchAdvisors } from "@/redux/slices/advisors-slice";
 import TextFormField from "@/common/components/shares/TextFormField";
@@ -104,7 +104,7 @@ const SpacingForm = () => {
         sm={12}
         md={12}
         lg={12}
-        icon={<Person />}
+        icon={<CircleUser size={16} />}
       />
     </Grid>
   );

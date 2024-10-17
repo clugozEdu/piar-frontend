@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useState } from "react";
 import Grid from "@mui/material/Grid2";
-import { Person } from "@mui/icons-material";
+import { CircleUser } from "lucide-react";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import { getData } from "@/services/api";
@@ -117,7 +117,7 @@ const ListForm = ({ idSpacing, setNameSpacing }) => {
         sm={12}
         md={12}
         lg={12}
-        icon={<Person />}
+        icon={<CircleUser size={16} />}
       />
     </Grid>
   );
