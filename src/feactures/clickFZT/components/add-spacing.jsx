@@ -21,7 +21,7 @@ import PropTypes from "prop-types";
 const AddSpacing = ({
   openDialog,
   setOpenDialog,
-  setShowAlert,
+  // setShowAlert,
   context,
   idSpacing,
 }) => {
@@ -119,7 +119,7 @@ const AddSpacing = ({
                 await postData("api/clickfzt/spacing/", values);
               }
               setOpenDialog(false);
-              setShowAlert(true);
+              // setShowAlert(true);
             } catch (error) {
               Swal.fire({
                 icon: "error",
@@ -196,7 +196,7 @@ const AddSpacing = ({
 AddSpacing.propTypes = {
   openDialog: PropTypes.bool.isRequired,
   setOpenDialog: PropTypes.func.isRequired,
-  setShowAlert: PropTypes.func,
+  // setShowAlert: PropTypes.func,
   context: PropTypes.string,
   idSpacing: PropTypes.string,
 };

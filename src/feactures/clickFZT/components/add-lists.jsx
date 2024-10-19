@@ -21,7 +21,7 @@ import PropTypes from "prop-types";
 const AddList = ({
   openDialog,
   setOpenDialog,
-  setShowAlert,
+  // setShowAlert,
   context,
   idSpacing,
   idList,
@@ -130,7 +130,7 @@ const AddList = ({
                 await postData("api/clickfzt/list", values);
               }
               setOpenDialog(false);
-              setShowAlert(true);
+              // setShowAlert(true);
             } catch (error) {
               Swal.fire({
                 icon: "error",
@@ -203,7 +203,7 @@ const AddList = ({
 AddList.propTypes = {
   openDialog: PropTypes.bool,
   setOpenDialog: PropTypes.func,
-  setShowAlert: PropTypes.func,
+  // setShowAlert: PropTypes.func,
   context: PropTypes.string,
   idSpacing: PropTypes.string,
   idList: PropTypes.string,

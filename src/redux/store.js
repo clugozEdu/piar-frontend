@@ -4,6 +4,7 @@ import advisorsSlice from "./slices/advisors-slice";
 import spacesSlice from "./slices/clickFZT/spaces-slices";
 import statusSlice from "./slices/clickFZT/status-slice";
 import prioritySlice from "./slices/clickFZT/priority-slice";
+import alertSlice from "./slices/alert-slice";
 
 const store = configureStore({
   reducer: {
@@ -13,6 +14,7 @@ const store = configureStore({
     spaces: spacesSlice,
     statusTask: statusSlice,
     priorityTask: prioritySlice,
+    alertWS: alertSlice,
   },
 });
 

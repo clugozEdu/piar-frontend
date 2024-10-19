@@ -53,6 +53,7 @@ const TaskPage = () => {
       // get tasks
       setTask(space.tasks);
       setIsLoading(false);
+      setMessageAlert("");
     }
   }, [listId, spaces, setIsLoading, statusTask, priorityTask]);
 
@@ -60,7 +61,10 @@ const TaskPage = () => {
     if (message) {
       console.log("Mensaje recibido", message);
       dispatch(fetchSpaces(advisor.id));
-      setMessageAlert(message);
+
+      // Actualiza el mensaje de alerta y muestra la alerta
+      setMessageAlert(message.event);
+      setShowAlert(true); // Activa la alerta cada vez que llega un nuevo mensaje
     }
   }, [message, dispatch, advisor]);
 
@@ -109,26 +113,27 @@ const TaskPage = () => {
         idList={listId}
       />
 
-      {showAlert && (
-        <SnackbarMessage
-          open={showAlert}
-          message={
-            messageAlert === "task_created"
-              ? "Tarea creada"
-              : messageAlert === "task_deleted"
-              ? "Tarea eliminada"
-              : "Tarea actualizada"
-          }
-          title={"Completado"}
-          onCloseHandler={() => {
-            setShowAlert(false);
-          }}
-          duration={3000}
-          severity="success"
-          vertical="bottom"
-          horizontal="right"
-        />
-      )}
+      {/* Snackbar de alerta */}
+      <SnackbarMessage
+        open={showAlert}
+        message={
+          messageAlert === "task_created"
+            ? "Tarea creada"
+            : messageAlert === "task_deleted"
+            ? "Tarea eliminada"
+            : messageAlert === "task_updated"
+            ? "Tarea actualizada"
+            : "Acción realizada"
+        }
+        title={"Completado"}
+        onCloseHandler={() => {
+          setShowAlert(false); // Cerrar la alerta cuando termine
+        }}
+        duration={3000}
+        severity="success"
+        vertical="bottom"
+        horizontal="right"
+      />
     </Box>
   );
 };

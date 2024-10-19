@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { setAlert } from "../../redux/slices/alert-slice";
 
 /** Hook useWebSocket
  * Hook to manage a WebSocket connection
@@ -6,8 +8,9 @@ import { useEffect, useState } from "react";
  */
 const useWebSocket = () => {
   /** Init state the hook */
-  const [message, setMessage] = useState(null);
   const token = localStorage.getItem("token-advisor");
+  const advisorLogin = JSON.parse(localStorage.getItem("advisor"));
+  const dispatch = useDispatch();
 
   /** UseEffect to manage the WebSocket connection
    * @param {string} token - Token to connect to the WebSocket
@@ -41,9 +44,9 @@ const useWebSocket = () => {
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-
-        // Set the current message to the latest one received
-        setMessage(data);
+        if (data.advisor_id === advisorLogin.id) {
+          dispatch(setAlert(data));
+        }
       } catch (error) {
         console.error("Error parsing WebSocket message: ", error);
       }
@@ -60,9 +63,9 @@ const useWebSocket = () => {
         ws.close();
       }
     };
-  }, [token]);
+  }, [token, dispatch, advisorLogin.id]);
 
-  return message;
+  return null;
 };
 
 export default useWebSocket;

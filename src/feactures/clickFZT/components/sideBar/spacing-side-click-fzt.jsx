@@ -23,7 +23,6 @@ import {
 import PropTypes from "prop-types";
 import ConfirmDeleteItems from "../delete-items";
 import AddList from "../add-lists";
-import SnackbarMessage from "@/common/components/ui/snackbar";
 
 const SpacingSideClickFZT = ({
   spacings,
@@ -36,7 +35,6 @@ const SpacingSideClickFZT = ({
   const [isAlertDelete, setIsAlertDelete] = useState(false);
   const [selectedSpacing, setSelectedSpacing] = useState("");
   const [selectedList, setSelectedList] = useState("");
-  const [showAlert, setShowAlert] = useState(false);
   const { spacingId, listId } = useParams();
   const theme = useTheme();
 
@@ -74,25 +72,10 @@ const SpacingSideClickFZT = ({
         <AddList
           openDialog={isDialogOpen}
           setOpenDialog={setIsDialogOpen}
-          setShowAlert={setShowAlert}
+          // setShowAlert={setShowAlert}
           context={"editList"}
           idList={selectedList}
           idSpacing={selectedSpacing}
-        />
-      )}
-
-      {showAlert && (
-        <SnackbarMessage
-          open={showAlert}
-          message="Lista editada correctamente"
-          title={"Completado"}
-          onCloseHandler={() => {
-            setShowAlert(false);
-          }}
-          duration={3000}
-          severity="success"
-          vertical="bottom"
-          horizontal="right"
         />
       )}
 
