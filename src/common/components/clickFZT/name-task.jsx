@@ -29,8 +29,7 @@ const TitleMenu = ({ task, setShowAlert }) => {
   useEffect(() => {
     setNewTitle(task.title);
     setTitleChanged(false); // Restablece cuando la tarea cambie
-    setIsLoading(false);
-  }, [task.title, setIsLoading]);
+  }, [task.title]);
 
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -125,7 +124,6 @@ const TitleMenu = ({ task, setShowAlert }) => {
           />
           <Button
             variant="contained"
-            color="primary"
             onClick={handleUpdateTitle}
             sx={{ mt: 2, borderRadius: 2, width: "100%" }}
             disabled={!titleChanged}

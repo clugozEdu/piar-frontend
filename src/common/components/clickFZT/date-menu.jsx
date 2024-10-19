@@ -21,8 +21,7 @@ const DateMenuCard = ({ text, task, keyUpdate, setShowAlert }) => {
 
   useEffect(() => {
     setDateVisit(task[keyUpdate]);
-    setIsLoading(false);
-  }, [task, keyUpdate, setIsLoading]);
+  }, [task, keyUpdate]);
 
   // Formatear la fecha para mostrarla en el componente
   const formattedDate = task[keyUpdate]
@@ -30,19 +29,16 @@ const DateMenuCard = ({ text, task, keyUpdate, setShowAlert }) => {
     : "Sin Fecha";
 
   const handleDateChange = async (newValue) => {
+    handleMenuClose();
     setIsLoading(true);
     try {
       setDateVisit(newValue);
-
       const formatNewValue = newValue ? new Date(newValue) : null;
-
       const dataPost = {
         [keyUpdate]: formatNewValue,
       };
-
       await putData(`api/clickfzt/tasks/${task.id}`, dataPost);
       setShowAlert(true);
-      handleMenuClose();
     } catch (error) {
       setError(true);
       setMessage(error.response.data.errorDetails.detail);

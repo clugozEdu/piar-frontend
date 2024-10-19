@@ -102,7 +102,7 @@ const BoardTask = ({
             size={{ xs: 12, sm: 12, md: 4, lg: 4 }}
             key={status.id}
             sx={{
-              maxHeight: 900,
+              maxHeight: "98vh",
               overflowY: "auto",
               overflowX: "hidden",
               scrollbarWidth: "none",

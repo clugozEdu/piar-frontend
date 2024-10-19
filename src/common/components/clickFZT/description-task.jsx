@@ -28,8 +28,7 @@ const DescriptionMenuCard = ({ task, setShowAlert }) => {
   useEffect(() => {
     setNewDescription(task.description);
     setDescriptionChanged(false);
-    setIsLoading(false);
-  }, [task.description, setIsLoading]);
+  }, [task.description]);
 
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -41,6 +40,7 @@ const DescriptionMenuCard = ({ task, setShowAlert }) => {
   };
 
   const handleUpdateDescription = async () => {
+    handleMenuClose();
     setIsLoading(true);
     try {
       const dataPost = {
@@ -48,7 +48,6 @@ const DescriptionMenuCard = ({ task, setShowAlert }) => {
       };
       await putData(`api/clickfzt/tasks/${task.id}`, dataPost);
       setShowAlert(true);
-      handleMenuClose();
     } catch (error) {
       setError(true);
       setMessage(error.response.data.errorDetails.detail);
@@ -119,7 +118,6 @@ const DescriptionMenuCard = ({ task, setShowAlert }) => {
             onChange={handleDescriptionChange}
             fullWidth
             multiline
-            minRows={3}
             sx={{
               "& .MuiInputBase-root": {
                 borderRadius: "20px",
@@ -128,7 +126,6 @@ const DescriptionMenuCard = ({ task, setShowAlert }) => {
           />
           <Button
             variant="contained"
-            color="primary"
             onClick={handleUpdateDescription}
             sx={{ mt: 2, borderRadius: 2, width: "100%" }}
             disabled={!descriptionChanged}

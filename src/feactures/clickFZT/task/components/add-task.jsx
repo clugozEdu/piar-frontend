@@ -38,9 +38,9 @@ const AddTask = ({
       if (idList) {
         getData(`api/clickfzt/list/${idList}`).then((data) => {
           setListName(data.title);
-          setLoadingDialog(false);
         });
       }
+      setLoadingDialog(false);
     } catch (error) {
       Swal.fire({
         icon: "error",

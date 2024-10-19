@@ -39,8 +39,7 @@ const PriorityChip = ({ priority, task, setShowAlert, priorityTask }) => {
     } else {
       setItemsMenu(priorityTask);
     }
-    setIsLoading(false);
-  }, [priority, priorityTask, setIsLoading]);
+  }, [priority, priorityTask]);
 
   // Mostrar el menú al hacer clic en el chip
   const handleMenuClick = (event) => {

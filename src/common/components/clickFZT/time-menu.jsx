@@ -25,8 +25,7 @@ const TimeMenu = ({ task, setShowAlert }) => {
 
   useEffect(() => {
     setInputValue(task.time_task);
-    setIsLoading(false);
-  }, [task.time_task, setIsLoading]);
+  }, [task.time_task]);
 
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -46,14 +45,15 @@ const TimeMenu = ({ task, setShowAlert }) => {
 
   const handleSaveTime = async () => {
     setIsLoading(true);
+    handleMenuClose();
     try {
       if (inputValue !== null && inputValue !== "") {
         const dataPost = {
           time_task: inputValue,
         };
+
         await putData(`api/clickfzt/tasks/${task.id}`, dataPost);
         setShowAlert(true);
-        handleMenuClose();
       }
     } catch (error) {
       setError(true);

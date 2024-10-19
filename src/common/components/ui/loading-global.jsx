@@ -4,7 +4,11 @@ import LinearProgress from "@mui/material/LinearProgress";
 const LoadingGLobal = () => {
   return (
     <Box sx={{ width: "100%" }}>
-      <LinearProgress />
+      <LinearProgress
+        sx={{
+          zIndex: 9999,
+        }}
+      />
     </Box>
   );
 };
