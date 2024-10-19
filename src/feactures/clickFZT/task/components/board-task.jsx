@@ -8,15 +8,14 @@ import { getColorsScheme } from "@/utilities/helpers";
 import PropTypes from "prop-types";
 
 const BoardTask = ({
-  statusTask,
   groupedTasks,
-  stateParent,
-  parent,
+  statusTask,
   handleAddTask,
   setShowAlert,
   priorityTask,
 }) => {
   const theme = useTheme();
+
   return (
     <>
       <Grid
@@ -25,7 +24,7 @@ const BoardTask = ({
         sx={{
           mt: 1,
         }}
-        ref={stateParent}
+        // ref={stateParent}
       >
         {statusTask.map((status) => (
           <Grid
@@ -85,7 +84,10 @@ const BoardTask = ({
                   sx={{
                     padding: "0px 10px 0px 0px",
                   }}
-                  onClick={() => handleAddTask(status.id)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleAddTask(status.id);
+                  }}
                 >
                   <CirclePlus color="white" size={24} />
                 </IconButton>
@@ -94,7 +96,7 @@ const BoardTask = ({
           </Grid>
         ))}
       </Grid>
-      <Grid container spacing={2} rowSpacing={2} ref={parent}>
+      <Grid container spacing={2} rowSpacing={2}>
         {statusTask.map((status) => (
           <Grid
             size={{ xs: 12, sm: 12, md: 4, lg: 4 }}
@@ -125,8 +127,6 @@ const BoardTask = ({
 
 BoardTask.propTypes = {
   groupedTasks: PropTypes.object.isRequired,
-  parent: PropTypes.func.isRequired,
-  stateParent: PropTypes.func.isRequired,
   statusTask: PropTypes.array.isRequired,
   handleAddTask: PropTypes.func.isRequired,
   priorityTask: PropTypes.array.isRequired,

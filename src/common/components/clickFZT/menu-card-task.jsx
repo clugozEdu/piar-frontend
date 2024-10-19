@@ -29,7 +29,7 @@ const MenuCards = ({ task, statusTask, setShowAlert }) => {
     const dataPost = {
       status_id: e.currentTarget.id,
     };
-    await putData(`api/clickup/tasks/${task.id}`, dataPost);
+    await putData(`api/clickfzt/tasks/${task.id}`, dataPost);
     setShowAlert(true);
     handleMenuClose();
   };

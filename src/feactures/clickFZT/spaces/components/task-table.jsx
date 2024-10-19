@@ -29,7 +29,7 @@ const TableTask = ({ tasks }) => {
           {task.title}
         </Link>
       ),
-      start_date: formatDate(task.start_date),
+      start_date: task.start_date ? formatDate(task.start_date) : "Sin Fecha",
       // start_date: (
       //   <DateMenuCard
       //     date={task.start_date}
@@ -37,7 +37,7 @@ const TableTask = ({ tasks }) => {
       //     keyUpdate={"start_date"}
       //   />
       // ),
-      end_date: formatDate(task.end_date),
+      end_date: task.start_date ? formatDate(task.start_date) : "Sin Fecha",
       // end_date: (
       //   <DateMenuCard
       //     date={task.end_date}

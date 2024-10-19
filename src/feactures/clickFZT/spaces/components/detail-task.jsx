@@ -34,7 +34,6 @@ const TableDetails = ({ lists, users }) => {
 
   const transformRow = (list) => {
     const filteredUsers = filterUsers(list.advisors, users);
-    console.log(filteredUsers);
     const listTasks = list.tasks.length;
     const listBacklog = list.tasks.filter(
       (task) => task.status.name === "Backlog"
@@ -54,7 +53,7 @@ const TableDetails = ({ lists, users }) => {
       id: list.id,
       name_list: (
         <Link
-          to={`/clickFZT/spacing/${spacingId}/list/${list.id}`}
+          to={`/clickFZT/spacing/${spacingId}/list/${list.id}/tasks`}
           style={{ textDecoration: "none", color: "inherit" }}
         >
           {list.title}

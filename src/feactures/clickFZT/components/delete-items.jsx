@@ -7,7 +7,6 @@ import "../../../styles.css";
 
 const handleDelete = (
   nameItem,
-  idElement,
   // setRedirect,
   onClose,
   handleOpen,
@@ -16,21 +15,24 @@ const handleDelete = (
   onClose();
   Swal.fire({
     title: "¿Estás seguro de eliminar este elemento?",
-    text: `Eliminarás  ${nameItem}`,
+    html: `Eliminarás <strong>${nameItem}</strong>`, // Usamos <strong> para poner en negrita
     icon: "warning",
     showCancelButton: true,
-    confirmButtonColor: "#3085d6",
-    cancelButtonColor: "#d33",
     confirmButtonText: "Sí, eliminar",
     cancelButtonText: "Cancelar",
-    // background: "linear-gradient(to top, #578e22,  #0084cb)",
-    // color: "#ffffff",
+    confirmButtonColor: "#0d1f2d",
+    cancelButtonColor: "#f44336",
+    background: "#f0f4f8",
     animation: true,
   }).then(async (result) => {
     if (result.isConfirmed) {
       await deleteData(pathDelete)
         .then(() => {
-          Swal.fire("Eliminado", "El elemento ha sido eliminado", "success");
+          Swal.fire(
+            "Eliminado",
+            `El elemento ${nameItem} ha sido eliminado`,
+            "success"
+          );
           // setRedirect(true);
         })
         .catch((error) => {
@@ -67,14 +69,13 @@ const ConfirmDeleteItems = ({
     if (nameItem) {
       handleDelete(
         nameItem,
-        idElement,
         // setRedirect,
         onClose,
         handleOpen,
         pathDelete
       );
     }
-  }, [nameItem, idElement, onClose, handleOpen, pathDelete]);
+  }, [nameItem, onClose, handleOpen, pathDelete]);
 
   // if (redirect) {
   //   return <Navigate to="/clickFZT/inicio" />;

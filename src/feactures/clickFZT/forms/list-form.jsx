@@ -21,7 +21,7 @@ const ListForm = ({ idSpacing, setNameSpacing }) => {
    * useCallback: to save the function in cache
    */
   const fetchSpacing = useCallback(() => {
-    getData(`api/clickup/spacing/${idSpacing}`).then((data) => {
+    getData(`api/clickfzt/spacing/${idSpacing}`).then((data) => {
       setNameSpacing(data.title);
       setAdvisorSpacing(data.advisors);
     });

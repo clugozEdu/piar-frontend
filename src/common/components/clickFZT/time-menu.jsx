@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTheme } from "@emotion/react";
 import {
   Menu,
@@ -12,11 +12,21 @@ import { Clock } from "lucide-react";
 import PropTypes from "prop-types";
 import { convertHours, getColorsScheme } from "@/utilities/helpers";
 import { putData } from "@/services/api";
+import SnackbarMessage from "../ui/snackbar";
+import useLoading from "@/common/hooks/calllbacks/loading";
 
 const TimeMenu = ({ task, setShowAlert }) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState(null);
-  const [inputValue, setInputValue] = useState(task.time_task); // Estado para almacenar el valor ingresado por el usuario
+  const [inputValue, setInputValue] = useState(task.time_task);
+  const [message, setMessage] = useState("");
+  const { setIsLoading } = useLoading();
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    setInputValue(task.time_task);
+    setIsLoading(false);
+  }, [task.time_task, setIsLoading]);
 
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -34,16 +44,23 @@ const TimeMenu = ({ task, setShowAlert }) => {
     }
   };
 
-  const handleSaveTime = () => {
-    if (inputValue !== null && inputValue !== "") {
-      const dataPost = {
-        time_task: inputValue,
-      };
-
-      putData(`api/clickup/tasks/${task.id}`, dataPost);
-      setShowAlert(true);
-
+  const handleSaveTime = async () => {
+    setIsLoading(true);
+    try {
+      if (inputValue !== null && inputValue !== "") {
+        const dataPost = {
+          time_task: inputValue,
+        };
+        await putData(`api/clickfzt/tasks/${task.id}`, dataPost);
+        setShowAlert(true);
+        handleMenuClose();
+      }
+    } catch (error) {
+      setError(true);
+      setMessage(error.response.data.errorDetails.detail);
+      setInputValue(task.time_task);
       handleMenuClose();
+      setIsLoading(false);
     }
   };
 
@@ -112,6 +129,21 @@ const TimeMenu = ({ task, setShowAlert }) => {
           </Button>
         </Box>
       </Menu>
+
+      {error && (
+        <SnackbarMessage
+          open={error}
+          message={`${message}`}
+          title={"Error"}
+          onCloseHandler={() => {
+            setError(false);
+          }}
+          duration={3000}
+          severity="error"
+          vertical="bottom"
+          horizontal="right"
+        />
+      )}
     </>
   );
 };

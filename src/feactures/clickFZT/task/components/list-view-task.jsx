@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Accordion,
   AccordionSummary,
@@ -22,6 +22,10 @@ import TimeMenu from "@/common/components/clickFZT/time-menu";
 import DescriptionMenuCard from "@/common/components/clickFZT/description-task";
 import TableTasks from "@/common/components/clickFZT/table-task";
 import TitleMenu from "@/common/components/clickFZT/name-task";
+import useWebSocket from "@/common/hooks/web-socket";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchSpaces } from "@/redux/slices/clickFZT/spaces-slices";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 const ListTask = ({
   groupedTasks,
@@ -31,6 +35,10 @@ const ListTask = ({
   priorityTask,
 }) => {
   const theme = useTheme();
+  const message = useWebSocket();
+  const dispatch = useDispatch();
+  const { advisor } = useSelector((state) => state.loginAdvisor);
+  const [animationParent] = useAutoAnimate();
 
   const [expanded, setExpanded] = useState(
     statusTask.reduce((acc, status) => {
@@ -50,6 +58,12 @@ const ListTask = ({
     e.stopPropagation();
     handleAddTask(statusId);
   };
+
+  useEffect(() => {
+    if (message) {
+      dispatch(fetchSpaces(advisor.id));
+    }
+  }, [message, dispatch, setShowAlert, advisor]);
 
   const columns = [
     { id: "title", label: "Nombre" },
@@ -209,7 +223,7 @@ const ListTask = ({
               </IconButton>
             </Box>
           </AccordionSummary>
-          <AccordionDetails>
+          <AccordionDetails ref={animationParent}>
             <TableTasks
               columns={columns}
               rows={groupedTasks[status.name]?.map(transformRow) || []}

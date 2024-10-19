@@ -56,7 +56,7 @@ const router = createBrowserRouter([
             element: <SpacingPage />,
           },
           {
-            path: "clickFZT/spacing/:spacingId/list/:listId",
+            path: "clickFZT/spacing/:spacingId/list/:listId/tasks",
             element: <TaskPage />,
           },
           {

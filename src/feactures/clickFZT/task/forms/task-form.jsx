@@ -1,10 +1,12 @@
 import Grid from "@mui/material/Grid2";
-import PropTypes from "prop-types";
 import TextFormField from "@/common/components/shares/TextFormField";
 import DateFormField from "@/common/components/shares/DateFormField";
 import SelectFormField from "@/common/components/shares/SelectFormField";
+import { useSelector } from "react-redux";
 
-const TaskForm = ({ priorityTask }) => {
+const TaskForm = () => {
+  const { priorityTask } = useSelector((state) => state.priorityTask);
+
   const renderTextFormField = (
     name,
     label,
@@ -94,10 +96,6 @@ const TaskForm = ({ priorityTask }) => {
       />
     </Grid>
   );
-};
-
-TaskForm.propTypes = {
-  priorityTask: PropTypes.array.isRequired,
 };
 
 export default TaskForm;

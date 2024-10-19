@@ -1,18 +1,22 @@
 import { useEffect, useState } from "react";
 import {
+  Box,
   Typography,
   DialogActions,
   CircularProgress,
   Button,
 } from "@mui/material";
-import { Save } from "lucide-react";
-
+import { useTheme } from "@emotion/react";
+import { Save, ListPlus, Pencil } from "lucide-react";
 import * as Yup from "yup";
+import Swal from "sweetalert2";
 import { getData, postData, putData } from "@/services/api";
-import PropTypes from "prop-types";
 import FormInit from "@/common/components/form/form-init";
+import SnackbarMessage from "@/common/components/ui/snackbar";
+import useLoading from "@/common/hooks/calllbacks/loading";
 import CreateDialog from "./create-dialog";
 import ListForm from "../forms/list-form";
+import PropTypes from "prop-types";
 
 const AddList = ({
   openDialog,
@@ -22,6 +26,7 @@ const AddList = ({
   idSpacing,
   idList,
 }) => {
+  const theme = useTheme();
   const [nameSpacing, setNameSpacing] = useState("");
 
   const [initValues, setInitValues] = useState({
@@ -30,26 +35,39 @@ const AddList = ({
     spacing_id: idSpacing,
     advisor_ids: [],
   });
-  const [isLoading, setIsLoading] = useState(context === "editList");
+  const [isLoadingDialog, setisLoadingDialog] = useState(
+    context === "editList"
+  );
+  const { setIsLoading } = useLoading();
 
   useEffect(() => {
+    console.log("AddList -> useEffect -> context", context);
     if (context === "editList") {
-      getData(`api/clickup/list/${idList}`).then((data) => {
-        const list = data;
-        setInitValues({
-          title: list.title,
-          description: list.description,
-          spacing_id: idSpacing,
-          advisor_ids: list.advisors.map((advisor) => advisor.id),
+      try {
+        getData(`api/clickfzt/list/${idList}`).then((data) => {
+          const list = data;
+          console.log("AddList -> useEffect -> list", list);
+          setInitValues({
+            title: list.title,
+            description: list.description,
+            spacing_id: idSpacing,
+            advisor_ids: list.advisors.map((advisor) => advisor.id),
+          });
+          setisLoadingDialog(false);
         });
-        setIsLoading(false);
-      });
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Error al obtener la lista",
+          text: error.message,
+        });
+      }
     }
   }, [context, idList, idSpacing]);
 
   const validateSchemaList = () =>
     Yup.object().shape({
-      title: Yup.string().required("El título es requerido"),
+      title: Yup.string().required("El título de la lista es requerido"),
       description: Yup.string().notRequired(),
       spacing_id: Yup.string().required("El id del espacio es requerido"),
       advisor_ids: Yup.array().notRequired(),
@@ -64,53 +82,76 @@ const AddList = ({
       title={
         context === "createList" ? (
           <>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              Creando Lista en {nameSpacing}
-            </Typography>
-            <Typography variant="body2" sx={{ flexGrow: 1 }}>
-              Una lista representa los principales departamentos u
-              organizaciones.
-            </Typography>
+            <Box display={"flex"} alignItems={"center"}>
+              <ListPlus size={24} color={theme.palette.primary.main} />
+              <Typography
+                variant="h6"
+                component="div"
+                sx={{ flexGrow: 1, padding: 0.5 }}
+              >
+                Creando Lista en: {nameSpacing}
+              </Typography>
+            </Box>
+            <Box display={"flex"} alignItems={"center"}>
+              <Typography variant="body2" sx={{ flexGrow: 1, padding: 0.5 }}>
+                Una lista representa los principales departamentos u
+                organizaciones.
+              </Typography>
+            </Box>
           </>
         ) : (
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Editando Lista en {nameSpacing}
-          </Typography>
+          <Box display={"flex"} alignItems={"center"}>
+            <Pencil size={24} color={theme.palette.primary.main} />
+            <Typography
+              variant="h6"
+              component="div"
+              sx={{ flexGrow: 1, padding: 0.5 }}
+            >
+              Editando la Lista: {initValues.title}
+            </Typography>
+          </Box>
         )
       }
       open={openDialog}
       onClose={handleClose}
-      isLoading={isLoading}
+      isLoading={isLoadingDialog}
     >
-      {!isLoading && initValues && (
+      {!isLoadingDialog && initValues && (
         <FormInit
           initialValues={initValues}
           validationSchema={validateSchemaList}
           onSubmit={async (values, actions) => {
+            console.log("AddList -> onSubmit -> values", values);
+            setIsLoading(true);
             try {
               if (context == "editList") {
-                await putData(`api/clickup/list/${idList}`, values);
+                await putData(`api/clickfzt/list/${idList}`, values);
               } else {
-                await postData("api/clickup/list", values);
+                await postData("api/clickfzt/list", values);
               }
               setOpenDialog(false);
               setShowAlert(true);
             } catch (error) {
-              console.error(error);
+              Swal.fire({
+                icon: "error",
+                title: "Error al guardar el espacio",
+                text: error.message,
+              });
             } finally {
               actions.setSubmitting(false);
+              setIsLoading(false);
             }
           }}
           enableReinitialize={true}
         >
-          {({ isSubmitting, handleSubmit }) => (
+          {({ isSubmitting, handleSubmit, errors }) => (
             <>
               <ListForm idSpacing={idSpacing} setNameSpacing={setNameSpacing} />
               <DialogActions
                 sx={{
+                  pt: 2,
                   display: "flex",
                   justifyContent: "flex-end",
-                  marginTop: "16px",
                 }}
               >
                 <Button
@@ -122,7 +163,7 @@ const AddList = ({
                     isSubmitting ? (
                       <CircularProgress size={24} />
                     ) : (
-                      <Save size={20} />
+                      <Save size={24} />
                     )
                   }
                   sx={{
@@ -135,6 +176,22 @@ const AddList = ({
                   {isSubmitting ? "Guardando..." : "Guardar Lista"}
                 </Button>
               </DialogActions>
+              {errors &&
+                Object.values(errors).length > 0 &&
+                Object.keys(errors).map((errorKey, index) => (
+                  <SnackbarMessage
+                    key={index}
+                    open={true}
+                    message={errors[errorKey].toString()}
+                    severity="error"
+                    onCloseHandler={() => {
+                      return false;
+                    }}
+                    duration={3000}
+                    vertical="bottom"
+                    horizontal="right"
+                  />
+                ))}
             </>
           )}
         </FormInit>

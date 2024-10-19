@@ -166,38 +166,6 @@ const TaskCard = ({
                 task={task}
                 setShowAlert={setShowAlert}
               />
-              {/* Tarea atrasada */}
-              {/* {isOverdue && (
-                <Chip
-                  label="Atrasada"
-                  icon={
-                    <EventBusyIcon
-                      sx={{
-                        fill: "red",
-                      }}
-                    />
-                  }
-                  sx={{
-                    backgroundColor: "transparent",
-                    borderRadius: 0,
-                  }}
-                />
-              )} */}
-              {/* Estado de la tarea */}
-              {/* <Chip
-                label={task.status.name}
-                // variant="outlined"
-                sx={{
-                  backgroundColor: getColorsScheme(
-                    task.status.name,
-                    theme.palette.chipStatus
-                  ),
-                  color: "white",
-                  marginRight: 1,
-                  padding: 0,
-                  borderRadius: 1,
-                }}
-              /> */}
             </Grid>
 
             {/* Usuario asignado a la tarea */}
@@ -241,8 +209,8 @@ const TaskCard = ({
           idElement={taskDelete}
           onClose={setDeleteConfirm}
           handleOpen={setTaskDelete}
-          pathGet={`api/clickup/tasks/${taskDelete}`}
-          pathDelete={`api/clickup/tasks/${taskDelete}`}
+          pathGet={`api/clickfzt/tasks/${taskDelete}`}
+          pathDelete={`api/clickfzt/tasks/${taskDelete}`}
         />
       )}
     </>

@@ -44,14 +44,20 @@ export const isTaskOverdue = (dueDate, statusTask) => {
 };
 
 export const groupedTask = (tasks) => {
-  return tasks.reduce((acc, task) => {
-    const status = task.status.name;
-    if (!acc[status]) {
-      acc[status] = [];
-    }
-    acc[status].push(task);
-    return acc;
-  }, {});
+  return tasks
+    .map((task) => ({
+      ...task,
+      overdue: isTaskOverdue(task.end_date, task.status.name),
+    }))
+    .sort((a, b) => dayjs(a.end_date).diff(dayjs(b.end_date)))
+    .reduce((acc, task) => {
+      const status = task.status.name;
+      if (!acc[status]) {
+        acc[status] = [];
+      }
+      acc[status].push(task);
+      return acc;
+    }, {});
 };
 export const getColorsScheme = (contextName, objectScheme) => {
   return objectScheme[contextName] || "default";

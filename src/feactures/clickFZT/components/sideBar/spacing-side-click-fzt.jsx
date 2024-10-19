@@ -20,7 +20,6 @@ import {
   Pencil,
   ListX,
 } from "lucide-react";
-
 import PropTypes from "prop-types";
 import ConfirmDeleteItems from "../delete-items";
 import AddList from "../add-lists";
@@ -58,8 +57,8 @@ const SpacingSideClickFZT = ({
     <div>
       {isAlertDelete && (
         <ConfirmDeleteItems
-          pathGet={`api/clickup/list/${selectedList}`}
-          pathDelete={`api/clickup/list/${selectedList}`}
+          pathGet={`api/clickfzt/list/${selectedList}`}
+          pathDelete={`api/clickfzt/list/${selectedList}`}
           handleOpen={setIsDialogOpen}
           onClose={() => {
             setIsDialogOpen(false);
@@ -200,7 +199,7 @@ const SpacingSideClickFZT = ({
                       id="list-item-button"
                       key={list.id}
                       component={Link}
-                      to={`clickFZT/spacing/${spacing.id}/list/${list.id}`}
+                      to={`clickFZT/spacing/${spacing.id}/list/${list.id}/tasks`}
                       sx={{
                         mt: 1,
                         mb: 1,

@@ -19,20 +19,28 @@ import { Box, MenuItem, Menu, IconButton, Typography } from "@mui/material";
 import { Flag } from "lucide-react";
 import { getColorsScheme } from "@/utilities/helpers";
 import { putData } from "@/services/api";
+import SnackbarMessage from "../ui/snackbar";
+import useLoading from "@/common/hooks/calllbacks/loading";
 
 // Opciones de prioridad
 const PriorityChip = ({ priority, task, setShowAlert, priorityTask }) => {
   // const { advisorLogin } = useUser();
   const [itemsMenu, setItemsMenu] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState(false);
   const theme = useTheme();
+  const { setIsLoading } = useLoading();
 
   // Actualizar el estado de las opciones de prioridad
   useEffect(() => {
     if (priority) {
       setItemsMenu(priorityTask?.filter((item) => item.id !== priority.id));
+    } else {
+      setItemsMenu(priorityTask);
     }
-  }, [priority, priorityTask]);
+    setIsLoading(false);
+  }, [priority, priorityTask, setIsLoading]);
 
   // Mostrar el menú al hacer clic en el chip
   const handleMenuClick = (event) => {
@@ -47,15 +55,21 @@ const PriorityChip = ({ priority, task, setShowAlert, priorityTask }) => {
 
   // Actualizar la prioridad de la tarea
   const handlePriorityUpdate = async (e) => {
-    const dataPost = {
-      priority_id: e.target.id,
-    };
-
-    await putData(`api/clickup/tasks/${task.id}`, dataPost);
-    setShowAlert(true);
-
-    // Actualizar la base de datos
-    handleMenuClose();
+    setIsLoading(true);
+    try {
+      const priorityId = e.currentTarget.dataset.id; // Accede al data-id
+      const dataPost = {
+        priority_id: priorityId,
+      };
+      await putData(`api/clickfzt/tasks/${task.id}`, dataPost);
+      setShowAlert(true);
+      handleMenuClose();
+    } catch (error) {
+      setError(true);
+      setMessage(error.response.data.errorDetails.detail);
+      handleMenuClose();
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -72,7 +86,11 @@ const PriorityChip = ({ priority, task, setShowAlert, priorityTask }) => {
           }}
         >
           <Flag
-            color={getColorsScheme(priority.name, theme.palette.priorityTask)}
+            color={
+              priority
+                ? getColorsScheme(priority.name, theme.palette.priorityTask)
+                : "gray"
+            }
             size={24}
           />
         </IconButton>
@@ -81,41 +99,54 @@ const PriorityChip = ({ priority, task, setShowAlert, priorityTask }) => {
           color="text.secondary"
           sx={{ fontSize: "0.8rem", ml: 1 }}
         >
-          {priority.name}
+          {priority ? priority.name : "Sin prioridad"}
         </Typography>
       </Box>
 
       <Menu
-        id="menu"
+        id="priority-menu"
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
       >
-        {itemsMenu?.map((item) => (
-          <MenuItem
-            id={item.id}
-            key={item.id}
-            onClick={(e) => {
-              handlePriorityUpdate(e);
-            }}
-          >
-            <Flag
-              color={getColorsScheme(item.name, theme.palette.priorityTask)}
-              size={24}
-            />
-            <Typography variant="body2" sx={{ ml: 1 }}>
-              {item.name}
-            </Typography>
-          </MenuItem>
-        ))}
+        {itemsMenu.length > 0 &&
+          itemsMenu.map((item) => (
+            <MenuItem
+              data-id={item.id} // Usa data-id en lugar de id
+              key={item.id}
+              onClick={handlePriorityUpdate}
+            >
+              <Flag
+                color={getColorsScheme(item.name, theme.palette.priorityTask)}
+                size={24}
+              />
+              <Typography variant="body2" sx={{ ml: 1 }}>
+                {item.name}
+              </Typography>
+            </MenuItem>
+          ))}
       </Menu>
+      {error && (
+        <SnackbarMessage
+          open={error}
+          message={`${message}`}
+          title={"Error"}
+          onCloseHandler={() => {
+            setError(false);
+          }}
+          duration={3000}
+          severity="error"
+          vertical="bottom"
+          horizontal="right"
+        />
+      )}
     </>
   );
 };
 
 // Validar props del componente PriorityChip
 PriorityChip.propTypes = {
-  priority: PropTypes.object.isRequired,
+  priority: PropTypes.object,
   task: PropTypes.object,
   setShowAlert: PropTypes.func,
   priorityTask: PropTypes.array,

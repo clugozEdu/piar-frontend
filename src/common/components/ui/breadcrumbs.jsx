@@ -18,7 +18,7 @@ const BreadCrumbsHeader = () => {
     try {
       if (spacingId) {
         setNameSpacing(
-          await getData(`api/clickup/spacing/${spacingId}`).then(
+          await getData(`api/clickfzt/spacing/${spacingId}`).then(
             (data) => data.title
           )
         );
@@ -26,7 +26,9 @@ const BreadCrumbsHeader = () => {
 
       if (listId) {
         setNameList(
-          await getData(`api/clickup/list/${listId}`).then((data) => data.title)
+          await getData(`api/clickfzt/list/${listId}`).then(
+            (data) => data.title
+          )
         );
       }
     } catch (error) {

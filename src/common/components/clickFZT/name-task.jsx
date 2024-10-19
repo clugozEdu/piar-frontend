@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Menu,
@@ -14,15 +14,27 @@ import { TypeOutline } from "lucide-react";
 import { Link } from "react-router-dom";
 import { putData } from "@/services/api";
 import { getColorsScheme } from "@/utilities/helpers";
+import useLoading from "@/common/hooks/calllbacks/loading";
+import SnackbarMessage from "../ui/snackbar";
 
 const TitleMenu = ({ task, setShowAlert }) => {
+  const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState(null);
   const [newTitle, setNewTitle] = useState(task.title || "");
-  const theme = useTheme();
+  const [titleChanged, setTitleChanged] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState(false);
+  const { setIsLoading } = useLoading();
+
+  useEffect(() => {
+    setNewTitle(task.title);
+    setTitleChanged(false); // Restablece cuando la tarea cambie
+    setIsLoading(false);
+  }, [task.title, setIsLoading]);
 
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
-    setNewTitle(task.title || ""); // Reiniciar el título al abrir el menú
+    setNewTitle(task.title);
   };
 
   const handleMenuClose = () => {
@@ -30,12 +42,25 @@ const TitleMenu = ({ task, setShowAlert }) => {
   };
 
   const handleUpdateTitle = async () => {
-    const dataPost = {
-      title: newTitle,
-    };
-    await putData(`api/clickup/tasks/${task.id}`, dataPost);
-    setShowAlert(true);
-    handleMenuClose();
+    setIsLoading(true);
+    try {
+      const dataPost = {
+        title: newTitle,
+      };
+      await putData(`api/clickfzt/tasks/${task.id}`, dataPost);
+      setShowAlert(true);
+      handleMenuClose();
+    } catch (error) {
+      setError(true);
+      setMessage(error.response.data.errorDetails.detail);
+      handleMenuClose();
+      setIsLoading(false);
+    }
+  };
+
+  const handleTitleChange = (e) => {
+    setNewTitle(e.target.value);
+    setTitleChanged(e.target.value !== task.title && e.target.value !== "");
   };
 
   return (
@@ -90,7 +115,7 @@ const TitleMenu = ({ task, setShowAlert }) => {
           <TextField
             label="Nuevo Título"
             value={newTitle}
-            onChange={(e) => setNewTitle(e.target.value)}
+            onChange={handleTitleChange}
             fullWidth
             sx={{
               "& .MuiInputBase-root": {
@@ -101,13 +126,29 @@ const TitleMenu = ({ task, setShowAlert }) => {
           <Button
             variant="contained"
             color="primary"
-            onClick={() => handleUpdateTitle()}
+            onClick={handleUpdateTitle}
             sx={{ mt: 2, borderRadius: 2, width: "100%" }}
+            disabled={!titleChanged}
           >
             Actualizar
           </Button>
         </Box>
       </Menu>
+
+      {error && (
+        <SnackbarMessage
+          open={error}
+          message={`${message}`}
+          title={"Error"}
+          onCloseHandler={() => {
+            setError(false);
+          }}
+          duration={3000}
+          severity="error"
+          vertical="bottom"
+          horizontal="right"
+        />
+      )}
     </>
   );
 };

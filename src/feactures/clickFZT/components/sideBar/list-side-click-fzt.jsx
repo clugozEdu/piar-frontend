@@ -21,11 +21,7 @@ import {
   ListPlus,
   FolderMinus,
 } from "lucide-react";
-
-import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
-import { getData } from "@/services/api";
-import CreateDialog from "../create-dialog";
 import AddSpacing from "../add-spacing";
 import AddList from "../add-lists";
 import ConfirmDeleteItems from "../delete-items";
@@ -33,6 +29,10 @@ import SpacingSideClickFZT from "./spacing-side-click-fzt";
 import SnackbarMessage from "@/common/components/ui/snackbar";
 import useWebSocket from "@/common/hooks/web-socket";
 import useLoading from "@/common/hooks/calllbacks/loading";
+// redux
+import { useSelector, useDispatch } from "react-redux";
+import { fetchSpaces } from "@/redux/slices/clickFZT/spaces-slices";
+import PropTypes from "prop-types";
 
 /** Component ListSideClickFZT
  * Render the list of spacings and lists for the advisor
@@ -55,62 +55,30 @@ const ListSideClickFZT = ({ advisorLogin }) => {
   const message = useWebSocket();
   const theme = useTheme();
 
-  /** Function to fetch spacing in api
-   * useCallback: hook to save in cache the function
-   * getData: function to get data from api
-   * urlApi: api/clickup/spacing/advisor/${advisorLogin.id}
-   * setIsLoading: function to set loading
-   * Filter the spacings and lists to add the property "isOwner"
-   * @param {string} advisorLogin.id - Id of the advisor login
-   * @returns {array} spacings - Array of objects with the spacings
-   * @returns {boolean} isResponsible - Boolean to check if the advisor is responsible
-   *
-   */
-  const fetchSpacings = useCallback(() => {
-    // setIsLoading(true);
-    getData(`api/clickup/spacing/advisor/`).then((data) => {
-      /** Add isOwner to spacing and list */
-      const updatedSpacings = data.map((spacing) => ({
-        ...spacing,
-        isOwner: spacing.owner_advisor.id === advisorLogin.id,
-        lists: spacing.lists.map((list) => ({
-          ...list,
-          isOwner: list.owner_advisor.id === advisorLogin.id,
-        })),
-      }));
+  // redux
+  const dispatch = useDispatch();
+  const { spaces } = useSelector((state) => state.spaces);
 
-      setSpacings(updatedSpacings);
-    });
-  }, [advisorLogin.id]);
-
-  /** UseEffect to fetchSpacing when the component is mounted
-   * fetchSpacings: function to fetch spacings
-   * dependecies: fetchSpacings
-   * setIsLoading: function to set loading
-   */
   useEffect(() => {
-    fetchSpacings();
+    // fetchRedux
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
-  }, [fetchSpacings, setIsLoading]);
+    dispatch(fetchSpaces(advisorLogin.id));
+  }, [dispatch, advisorLogin.id, setIsLoading]);
 
-  /** UseEffect to read message to webSocket
-   * @param {object} message - [Object] with the message from webSocket
-   * event: event to create spacing
-   * fetchSpacings: function to fetch spacings
-   * dependecies: message, fetchSpacings
-   */
+  useEffect(() => {
+    if (spaces.length > 0) {
+      setSpacings(spaces);
+      setIsLoading(false);
+    }
+  }, [spaces, setIsLoading]);
+
   useEffect(() => {
     if (message?.event) {
+      console.log("message desde creando espacios o listas", message);
       setMessageAlert(message.event);
-      fetchSpacings();
+      dispatch(fetchSpaces(advisorLogin.id));
     }
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
-  }, [message, fetchSpacings, setIsLoading]);
+  }, [message, dispatch, setMessageAlert, advisorLogin.id]);
 
   /** Handle to open and close item list
    * useCallback: hook to save in cache the function
@@ -192,13 +160,6 @@ const ListSideClickFZT = ({ advisorLogin }) => {
     handleMenuClose(false);
     setContextDialog("createList");
     setIsDialogOpen(true);
-  };
-
-  /** Handle to close dialog
-   * @returns {false} isDialogOpen - close dialog
-   */
-  const handleCloseDialog = () => {
-    setIsDialogOpen(false);
   };
 
   /** Get component dialog to show depending on the context
@@ -425,15 +386,13 @@ const ListSideClickFZT = ({ advisorLogin }) => {
       </Menu>
 
       {/* Render dialog to create spacing or list */}
-      <CreateDialog open={isDialogOpen} onClose={handleCloseDialog}>
-        {getDialogComponent()}
-      </CreateDialog>
+      {getDialogComponent()}
 
       {/* Render delete confirmation */}
       {isDeleteConfirmOpen && selectedSpacing && (
         <ConfirmDeleteItems
-          pathGet={`api/clickup/spacing/${selectedSpacing}`}
-          pathDelete={`api/clickup/spacing/${selectedSpacing}`}
+          pathGet={`api/clickfzt/spacing/${selectedSpacing}`}
+          pathDelete={`api/clickfzt/spacing/${selectedSpacing}`}
           idElement={selectedSpacing}
           onClose={handleMenuClose}
           handleOpen={setIsDeleteConfirmOpen}

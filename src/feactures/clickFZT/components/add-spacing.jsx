@@ -1,17 +1,22 @@
 import { useEffect, useState } from "react";
-import * as Yup from "yup";
-import PropTypes from "prop-types";
-import FormInit from "@/common/components/form/form-init";
-import CreateDialog from "./create-dialog";
-import SpacingForm from "../forms/spacing-form";
-import { postData, getData, putData } from "@/services/api";
 import {
+  Box,
   Typography,
   DialogActions,
   Button,
   CircularProgress,
 } from "@mui/material";
-import { Save } from "lucide-react";
+import { useTheme } from "@emotion/react";
+import * as Yup from "yup";
+import Swal from "sweetalert2";
+import { Save, Pencil, FolderPlus } from "lucide-react";
+import FormInit from "@/common/components/form/form-init";
+import CreateDialog from "./create-dialog";
+import SpacingForm from "../forms/spacing-form";
+import { postData, getData, putData } from "@/services/api";
+import useLoading from "@/common/hooks/calllbacks/loading";
+import SnackbarMessage from "@/common/components/ui/snackbar";
+import PropTypes from "prop-types";
 
 const AddSpacing = ({
   openDialog,
@@ -20,35 +25,48 @@ const AddSpacing = ({
   context,
   idSpacing,
 }) => {
-  /** Initialize initValues as null */
   const [initValues, setInitValues] = useState(null);
-  const [isLoading, setIsLoading] = useState(context === "editSpacing");
+  const [isLoadingDialog, setLoadingDialog] = useState(
+    context === "editSpacing"
+  );
+  const { setIsLoading } = useLoading();
+  const theme = useTheme();
+
+  /** Estado para controlar si se ha intentado hacer submit */
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
   useEffect(() => {
     if (context === "editSpacing") {
-      getData(`api/clickup/spacing/${idSpacing}`).then((data) => {
-        const spacing = data;
-        setInitValues({
-          title: spacing.title,
-          description: spacing.description,
-          advisor_ids: spacing.advisors.map((advisor) => advisor.id),
+      try {
+        getData(`api/clickfzt/spacing/${idSpacing}`).then((data) => {
+          const spacing = data;
+          setInitValues({
+            title: spacing.title,
+            description: spacing.description,
+            advisor_ids: spacing.advisors.map((advisor) => advisor.id),
+          });
+          setLoadingDialog(false);
         });
-        setIsLoading(false);
-      });
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Error al obtener el espacio",
+          text: error.message,
+        });
+      }
     } else {
-      /** Set initial values for createSpacing context */
       setInitValues({
         title: "",
         description: "",
         advisor_ids: [],
       });
-      setIsLoading(false);
+      setLoadingDialog(false);
     }
   }, [context, idSpacing]);
 
   const validateShemaSpacing = () =>
     Yup.object({
-      title: Yup.string().required("El título es requerido"),
+      title: Yup.string().required("El título del espacio es requerido"),
       description: Yup.string().notRequired(),
       advisor_ids: Yup.array().notRequired(),
     });
@@ -62,66 +80,82 @@ const AddSpacing = ({
       title={
         context === "createSpacing" ? (
           <>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              Creando Espacio
-            </Typography>
-            <Typography variant="body2" sx={{ flexGrow: 1 }}>
-              Un espacio representa a los equipos, departamentos o grupos, cada
-              uno con sus propias listas, flujos de trabajo.
-            </Typography>
+            <Box display={"flex"} alignItems={"center"}>
+              <FolderPlus size={24} color={theme.palette.primary.main} />
+              <Typography variant="h6" component="div" sx={{ padding: 0.5 }}>
+                Creando Espacio
+              </Typography>
+            </Box>
+            <Box display={"flex"} alignItems={"center"}>
+              <Typography variant="body2" sx={{ flexGrow: 1, padding: 0 }}>
+                Un espacio representa a los equipos, departamentos o grupos,
+                cada uno con sus propias listas y flujos de trabajo.
+              </Typography>
+            </Box>
           </>
         ) : (
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Editando Espacio
-          </Typography>
+          <Box display={"flex"} alignItems={"center"}>
+            <Pencil size={24} color={theme.palette.primary.main} />
+            <Typography variant="h6" component="div" sx={{ padding: 0.5 }}>
+              Editando Espacio: {initValues?.title}
+            </Typography>
+          </Box>
         )
       }
       open={openDialog}
       onClose={handleClose}
-      isLoading={isLoading} // Pass isLoading to the dialog
+      isLoading={isLoadingDialog}
     >
-      {!isLoading && initValues && (
+      {!isLoadingDialog && initValues && (
         <FormInit
           initialValues={initValues}
           validationSchema={validateShemaSpacing}
           onSubmit={async (values, actions) => {
+            setIsLoading(true);
             try {
               if (context === "editSpacing") {
-                await putData(`api/clickup/spacing/${idSpacing}`, values);
+                await putData(`api/clickfzt/spacing/${idSpacing}`, values);
               } else {
-                await postData("api/clickup/spacing/", values);
+                await postData("api/clickfzt/spacing/", values);
               }
               setOpenDialog(false);
               setShowAlert(true);
             } catch (error) {
-              console.error(error);
-              // Handle error if needed
+              Swal.fire({
+                icon: "error",
+                title: "Error al guardar el espacio",
+                text: error.message,
+              });
             } finally {
               actions.setSubmitting(false);
+              setIsLoading(false);
             }
           }}
           enableReinitialize={true}
         >
-          {({ isSubmitting, handleSubmit }) => (
+          {({ isSubmitting, handleSubmit, errors }) => (
             <>
               <SpacingForm />
               <DialogActions
                 sx={{
+                  pt: 2,
                   display: "flex",
                   justifyContent: "flex-end",
-                  marginTop: "16px",
                 }}
               >
                 <Button
                   type="button"
                   variant="contained"
                   disabled={isSubmitting}
-                  onClick={handleSubmit}
+                  onClick={() => {
+                    setHasSubmitted(true); // Marcar que se ha intentado hacer submit
+                    handleSubmit();
+                  }}
                   startIcon={
                     isSubmitting ? (
                       <CircularProgress size={24} />
                     ) : (
-                      <Save size={20} />
+                      <Save size={24} />
                     )
                   }
                   sx={{
@@ -134,6 +168,23 @@ const AddSpacing = ({
                   {isSubmitting ? "Guardando..." : "Guardar Espacio"}
                 </Button>
               </DialogActions>
+
+              {/* Mostrar Snackbar solo si se ha hecho submit y hay errores */}
+              {hasSubmitted &&
+                Object.keys(errors).map((errorKey, index) => (
+                  <SnackbarMessage
+                    key={index}
+                    open={true}
+                    message={errors[errorKey].toString()}
+                    severity="error"
+                    onCloseHandler={() => {
+                      setHasSubmitted(false);
+                    }}
+                    duration={3000}
+                    vertical="bottom"
+                    horizontal="right"
+                  />
+                ))}
             </>
           )}
         </FormInit>

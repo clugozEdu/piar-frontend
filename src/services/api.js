@@ -1,7 +1,8 @@
 import axios from "axios";
 import tokenRefresh from "@/common/hooks/use-token-refresh";
 
-const BASE_URL = "http://192.168.1.197/";
+// const BASE_URL = "http://192.168.1.197/";
+const BASE_URL = "http://52.200.125.6/";
 
 /** Get Token
  * @returns {string} token - Token from localStorage
@@ -31,11 +32,10 @@ const createHeaders = (isJson = true) => {
  * @param {object} error - Object with the error data
  */
 const handleError = (error) => {
-  if (error) {
+  if (error.status === 401) {
     tokenRefresh(error);
-  } else {
-    console.error("Error general:", error.message || "Error desconocido");
   }
+
   throw error;
 };
 

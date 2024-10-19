@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTheme } from "@emotion/react";
 import { Typography, Menu, Box, IconButton } from "@mui/material";
 import { CalendarDays } from "lucide-react";
@@ -8,11 +8,21 @@ import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { formatDate, getColorsScheme } from "@/utilities/helpers";
 import PropTypes from "prop-types";
 import { putData } from "@/services/api";
+import useLoading from "@/common/hooks/calllbacks/loading";
+import SnackbarMessage from "../ui/snackbar";
 
 const DateMenuCard = ({ text, task, keyUpdate, setShowAlert }) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState(null);
   const [dateVisit, setDateVisit] = useState(task[keyUpdate]);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState(false);
+  const { setIsLoading } = useLoading();
+
+  useEffect(() => {
+    setDateVisit(task[keyUpdate]);
+    setIsLoading(false);
+  }, [task, keyUpdate, setIsLoading]);
 
   // Formatear la fecha para mostrarla en el componente
   const formattedDate = task[keyUpdate]
@@ -20,17 +30,25 @@ const DateMenuCard = ({ text, task, keyUpdate, setShowAlert }) => {
     : "Sin Fecha";
 
   const handleDateChange = async (newValue) => {
-    setDateVisit(newValue);
+    setIsLoading(true);
+    try {
+      setDateVisit(newValue);
 
-    const formattedDate = newValue ? new Date(newValue) : null;
+      const formatNewValue = newValue ? new Date(newValue) : null;
 
-    const dataPost = {
-      [keyUpdate]: formattedDate,
-    };
+      const dataPost = {
+        [keyUpdate]: formatNewValue,
+      };
 
-    await putData(`api/clickup/tasks/${task.id}`, dataPost);
-    setShowAlert(true);
-    handleMenuClose();
+      await putData(`api/clickfzt/tasks/${task.id}`, dataPost);
+      setShowAlert(true);
+      handleMenuClose();
+    } catch (error) {
+      setError(true);
+      setMessage(error.response.data.errorDetails.detail);
+      handleMenuClose();
+      setIsLoading(false);
+    }
   };
 
   // Mostrar el menú al hacer clic en el icono
@@ -91,6 +109,20 @@ const DateMenuCard = ({ text, task, keyUpdate, setShowAlert }) => {
           </LocalizationProvider>
         </Box>
       </Menu>
+      {error && (
+        <SnackbarMessage
+          open={error}
+          message={`${message}`}
+          title={"Error"}
+          onCloseHandler={() => {
+            setError(false);
+          }}
+          duration={3000}
+          severity="error"
+          vertical="bottom"
+          horizontal="right"
+        />
+      )}
     </>
   );
 };

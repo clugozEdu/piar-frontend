@@ -23,7 +23,14 @@ const CreateDialog = ({ open, onClose, children, title, isLoading }) => {
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle id="title-dialog">{title}</DialogTitle>
+      <DialogTitle
+        id="title-dialog"
+        sx={{
+          padding: 1,
+        }}
+      >
+        {title}
+      </DialogTitle>
       {isLoading && <LoadingGLobal />}
 
       <IconButton
@@ -32,11 +39,11 @@ const CreateDialog = ({ open, onClose, children, title, isLoading }) => {
         sx={(theme) => ({
           position: "absolute",
           right: 8,
-          top: 8,
-          color: theme.palette.grey[500],
+          top: 4,
+          color: theme.palette.primary.main,
         })}
       >
-        <CircleX size={24} />
+        <CircleX size={25} />
       </IconButton>
 
       <DialogContent dividers sx={dialogContentStyle}>

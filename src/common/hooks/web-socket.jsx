@@ -24,7 +24,8 @@ const useWebSocket = () => {
     /** Create the WebSocket connection
      * @param {string} url - URL to connect to the WebSocket
      */
-    ws = new WebSocket("http://192.168.1.197/ws");
+    // ws = new WebSocket("http://192.168.1.197/ws");
+    ws = new WebSocket("http://52.200.125.6/ws");
 
     /** WebSocket open connection */
     ws.onopen = () => {

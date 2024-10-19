@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { Button, DialogActions, CircularProgress, Box } from "@mui/material";
 import * as Yup from "yup";
 import PropTypes from "prop-types";
@@ -8,53 +8,47 @@ import SelectFormField from "@/common/components/shares/SelectFormField";
 import FormInit from "@/common/components/form/form-init";
 import { getData, postData } from "@/services/api";
 import TaskForm from "../forms/task-form";
+import Swal from "sweetalert2";
 
 const AddTask = ({
   openDialog,
   setShowAlert,
   setIsDialogOpen,
   idStatus,
-  idList, // Puede ser null o undefined si viene desde un espacio
-  lists = [], // Opcional, solo necesario si viene desde un espacio
+  idList,
+  lists = [],
   statusTask,
 }) => {
   const [nameList, setListName] = useState("");
-  const [priorityTask, setPriorityTask] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-
-  console.log(statusTask);
+  const [isLoadingDialog, setLoadingDialog] = useState(true);
 
   const initValues = {
     title: "",
     description: "",
     start_date: null,
     end_date: null,
-    time_task: "",
+    time_task: 0,
     status_id: idStatus,
     priority_id: "",
-    list_id: lists.length > 0 ? "" : idList, // Se utilizará la lista seleccionada o el idList pasado
+    list_id: lists.length > 0 ? "" : idList,
   };
 
-  // Fetch de datos solo si hay un idList proporcionado
-  const fetchDataApi = useCallback(() => {
-    setIsLoading(true);
-
-    if (idList) {
-      // Solo ejecutar el fetch si tenemos un idList
-      getData(`api/clickup/list/${idList}`).then((data) =>
-        setListName(data.title)
-      );
-    }
-
-    // Obtener prioridades de la tarea (esto siempre se ejecuta)
-    getData(`api/clickup/priority`).then((data) => setPriorityTask(data));
-
-    setIsLoading(false);
-  }, [idList]);
-
   useEffect(() => {
-    fetchDataApi();
-  }, [fetchDataApi]);
+    try {
+      if (idList) {
+        getData(`api/clickfzt/list/${idList}`).then((data) => {
+          setListName(data.title);
+          setLoadingDialog(false);
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error al obtener los datos",
+        text: error.message,
+      });
+    }
+  }, [idList, setIsDialogOpen]);
 
   const validateSchemaTask = () => {
     // Busca el estado de "Backlog" en el array statusTask
@@ -127,11 +121,20 @@ const AddTask = ({
       });
   };
 
-  const handleSubmitForm = async (values) => {
-    console.log(values);
-    await postData("api/clickup/tasks", values);
-    setIsDialogOpen(false);
-    setShowAlert(true);
+  const handleSubmitForm = async (values, actions) => {
+    try {
+      await postData("api/clickfzt/tasks", values);
+      setIsDialogOpen(false);
+      setShowAlert(true);
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error al guardar la tarea",
+        text: error.message,
+      });
+    } finally {
+      actions.setSubmitting(false);
+    }
   };
 
   return (
@@ -139,13 +142,13 @@ const AddTask = ({
       title={`Agregar Tarea ${nameList ? `a la Lista: ${nameList}` : ""}`}
       open={openDialog}
       onClose={setIsDialogOpen}
-      isLoading={isLoading}
+      isLoading={isLoadingDialog}
     >
-      {!isLoading && initValues && (
+      {!isLoadingDialog && (
         <FormInit
           initialValues={initValues}
           validationSchema={validateSchemaTask}
-          onSubmit={handleSubmitForm}
+          onSubmit={(values, actions) => handleSubmitForm(values, actions)}
           enableReinitialize={true}
         >
           {({ isSubmitting, handleSubmit }) => (
@@ -169,7 +172,7 @@ const AddTask = ({
               )}
 
               {/* Formulario de la tarea */}
-              <TaskForm priorityTask={priorityTask} />
+              <TaskForm />
 
               <DialogActions
                 sx={{

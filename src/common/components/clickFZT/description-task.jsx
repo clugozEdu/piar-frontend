@@ -1,49 +1,67 @@
-import { useState, useEffect } from "react";
-import { Typography, Box, Menu, Button, IconButton } from "@mui/material";
-import { useTheme } from "@emotion/react";
+import { useEffect, useState } from "react";
+import {
+  Box,
+  Menu,
+  Typography,
+  TextField,
+  Button,
+  Divider,
+  IconButton,
+} from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { FileText } from "lucide-react";
-import TextAreaCustom from "./text-area";
-import { getColorsScheme } from "@/utilities/helpers";
 import { putData } from "@/services/api";
+import { getColorsScheme } from "@/utilities/helpers";
+import SnackbarMessage from "../ui/snackbar";
+import useLoading from "@/common/hooks/calllbacks/loading";
 import PropTypes from "prop-types";
 
 const DescriptionMenuCard = ({ task, setShowAlert }) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState(null);
-  const [descriptionTask, setDescriptionTask] = useState(
-    task.description || ""
-  );
-  const [descriptionTruncate, setDescriptionTruncate] =
-    useState(descriptionTask);
+  const [newDescription, setNewDescription] = useState(task.description || "");
+  const [descriptionChanged, setDescriptionChanged] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState(false);
+  const { setIsLoading } = useLoading();
 
-  // Actualizar el estado de la descripción truncada
   useEffect(() => {
-    if (descriptionTask.length > 45) {
-      setDescriptionTruncate(descriptionTask.substring(0, 45) + "...");
-    } else {
-      setDescriptionTruncate(descriptionTask);
-    }
-  }, [descriptionTask]);
+    setNewDescription(task.description);
+    setDescriptionChanged(false);
+    setIsLoading(false);
+  }, [task.description, setIsLoading]);
 
-  // Mostrar el menú al hacer clic en el ícono
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
-    setDescriptionTask(task.description || "");
+    setNewDescription(task.description);
   };
 
-  // Cerrar el menú
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
 
-  // Guardar los cambios en la descripción
-  const handleSaveClick = async () => {
-    const dataPost = {
-      description: descriptionTask,
-    };
-    await putData(`api/clickup/tasks/${task.id}`, dataPost);
-    setShowAlert(true);
-    handleMenuClose();
+  const handleUpdateDescription = async () => {
+    setIsLoading(true);
+    try {
+      const dataPost = {
+        description: newDescription,
+      };
+      await putData(`api/clickfzt/tasks/${task.id}`, dataPost);
+      setShowAlert(true);
+      handleMenuClose();
+    } catch (error) {
+      setError(true);
+      setMessage(error.response.data.errorDetails.detail);
+      handleMenuClose();
+      setIsLoading(false);
+    }
+  };
+
+  const handleDescriptionChange = (e) => {
+    setNewDescription(e.target.value);
+    setDescriptionChanged(
+      e.target.value !== task.description && e.target.value !== ""
+    );
   };
 
   return (
@@ -60,10 +78,23 @@ const DescriptionMenuCard = ({ task, setShowAlert }) => {
           }}
         >
           <FileText
-            sixe={20}
+            size={24}
             color={getColorsScheme(task.status.name, theme.palette.statusTask)}
           />
         </IconButton>
+
+        <Divider
+          orientation="vertical"
+          flexItem
+          sx={{
+            mr: 1,
+            ml: 1,
+            background: getColorsScheme(
+              task.status.name,
+              theme.palette.statusTask
+            ),
+          }}
+        />
 
         <Typography
           variant="body1"
@@ -73,7 +104,7 @@ const DescriptionMenuCard = ({ task, setShowAlert }) => {
             ml: 1,
           }}
         >
-          {descriptionTruncate || "Descripción no disponible"}
+          {task.description || "Descripción no disponible"}
         </Typography>
       </Box>
       <Menu
@@ -81,51 +112,51 @@ const DescriptionMenuCard = ({ task, setShowAlert }) => {
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
       >
-        <Box sx={{ p: 1, maxWidth: 500 }}>
-          <Typography
-            variant="h6"
-            gutterBottom
-            sx={{
-              fontSize: "0.8rem",
-            }}
-          >
-            Descripción
-          </Typography>
-          <TextAreaCustom
+        <Box p={2}>
+          <TextField
+            label="Nueva Descripción"
+            value={newDescription}
+            onChange={handleDescriptionChange}
+            fullWidth
+            multiline
             minRows={3}
-            value={descriptionTask}
-            onChange={(e) => setDescriptionTask(e.target.value)}
+            sx={{
+              "& .MuiInputBase-root": {
+                borderRadius: "20px",
+              },
+            }}
           />
-
-          <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-            <Button
-              variant="contained"
-              color="error"
-              onClick={handleMenuClose}
-              sx={{ mt: 1, mr: 1 }}
-            >
-              Cancelar
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleSaveClick()}
-              sx={{ mt: 1 }}
-            >
-              Guardar
-            </Button>
-          </Box>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleUpdateDescription}
+            sx={{ mt: 2, borderRadius: 2, width: "100%" }}
+            disabled={!descriptionChanged}
+          >
+            Actualizar
+          </Button>
         </Box>
       </Menu>
+
+      {error && (
+        <SnackbarMessage
+          open={error}
+          message={message}
+          title="Error"
+          onCloseHandler={() => setError(false)}
+          duration={3000}
+          severity="error"
+          vertical="bottom"
+          horizontal="right"
+        />
+      )}
     </>
   );
 };
 
-// Validar las props del componente
 DescriptionMenuCard.propTypes = {
-  // description: PropTypes.object,
-  task: PropTypes.object,
-  setShowAlert: PropTypes.func,
+  task: PropTypes.object.isRequired,
+  setShowAlert: PropTypes.func.isRequired,
 };
 
 export default DescriptionMenuCard;
