@@ -15,7 +15,7 @@ import { putData } from "@/services/api";
 import SnackbarMessage from "../ui/snackbar";
 import useLoading from "@/common/hooks/calllbacks/loading";
 
-const TimeMenu = ({ task, setShowAlert }) => {
+const TimeMenu = ({ task }) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState(null);
   const [inputValue, setInputValue] = useState(task.time_task);
@@ -53,7 +53,7 @@ const TimeMenu = ({ task, setShowAlert }) => {
         };
 
         await putData(`api/clickfzt/tasks/${task.id}`, dataPost);
-        setShowAlert(true);
+        // setShowAlert(true);
       }
     } catch (error) {
       setError(true);
@@ -150,7 +150,7 @@ const TimeMenu = ({ task, setShowAlert }) => {
 
 TimeMenu.propTypes = {
   task: PropTypes.object.isRequired,
-  setShowAlert: PropTypes.func,
+  // setShowAlert: PropTypes.func,
 };
 
 export default TimeMenu;

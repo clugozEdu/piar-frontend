@@ -27,8 +27,8 @@ const AddList = ({
   idList,
 }) => {
   const theme = useTheme();
+  const { setIsLoading } = useLoading();
   const [nameSpacing, setNameSpacing] = useState("");
-
   const [initValues, setInitValues] = useState({
     title: "",
     description: "",
@@ -38,10 +38,11 @@ const AddList = ({
   const [isLoadingDialog, setisLoadingDialog] = useState(
     context === "editList"
   );
-  const { setIsLoading } = useLoading();
+
+  /** Estado para controlar si se ha intentado hacer submit */
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
   useEffect(() => {
-    console.log("AddList -> useEffect -> context", context);
     if (context === "editList") {
       try {
         getData(`api/clickfzt/list/${idList}`).then((data) => {
@@ -158,7 +159,10 @@ const AddList = ({
                   type="button"
                   variant="contained"
                   disabled={isSubmitting}
-                  onClick={handleSubmit}
+                  onClick={() => {
+                    setHasSubmitted(true); // Marcar que se ha intentado hacer submit
+                    handleSubmit();
+                  }}
                   startIcon={
                     isSubmitting ? (
                       <CircularProgress size={24} />
@@ -176,8 +180,8 @@ const AddList = ({
                   {isSubmitting ? "Guardando..." : "Guardar Lista"}
                 </Button>
               </DialogActions>
-              {errors &&
-                Object.values(errors).length > 0 &&
+              {/* Mostrar Snackbar solo si se ha hecho submit y hay errores */}
+              {hasSubmitted &&
                 Object.keys(errors).map((errorKey, index) => (
                   <SnackbarMessage
                     key={index}
@@ -185,7 +189,7 @@ const AddList = ({
                     message={errors[errorKey].toString()}
                     severity="error"
                     onCloseHandler={() => {
-                      return false;
+                      setHasSubmitted(false);
                     }}
                     duration={3000}
                     vertical="bottom"

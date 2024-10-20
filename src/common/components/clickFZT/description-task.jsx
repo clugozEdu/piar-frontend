@@ -16,7 +16,7 @@ import SnackbarMessage from "../ui/snackbar";
 import useLoading from "@/common/hooks/calllbacks/loading";
 import PropTypes from "prop-types";
 
-const DescriptionMenuCard = ({ task, setShowAlert }) => {
+const DescriptionMenuCard = ({ task }) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState(null);
   const [newDescription, setNewDescription] = useState(task.description || "");
@@ -47,7 +47,7 @@ const DescriptionMenuCard = ({ task, setShowAlert }) => {
         description: newDescription,
       };
       await putData(`api/clickfzt/tasks/${task.id}`, dataPost);
-      setShowAlert(true);
+      // setShowAlert(true);
     } catch (error) {
       setError(true);
       setMessage(error.response.data.errorDetails.detail);
@@ -153,7 +153,7 @@ const DescriptionMenuCard = ({ task, setShowAlert }) => {
 
 DescriptionMenuCard.propTypes = {
   task: PropTypes.object.isRequired,
-  setShowAlert: PropTypes.func.isRequired,
+  // setShowAlert: PropTypes.func.isRequired,
 };
 
 export default DescriptionMenuCard;

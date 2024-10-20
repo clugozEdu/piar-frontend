@@ -11,7 +11,7 @@ import { putData } from "@/services/api";
 import useLoading from "@/common/hooks/calllbacks/loading";
 import SnackbarMessage from "../ui/snackbar";
 
-const DateMenuCard = ({ text, task, keyUpdate, setShowAlert }) => {
+const DateMenuCard = ({ text, task, keyUpdate }) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState(null);
   const [dateVisit, setDateVisit] = useState(task[keyUpdate]);
@@ -38,7 +38,7 @@ const DateMenuCard = ({ text, task, keyUpdate, setShowAlert }) => {
         [keyUpdate]: formatNewValue,
       };
       await putData(`api/clickfzt/tasks/${task.id}`, dataPost);
-      setShowAlert(true);
+      // setShowAlert(true);
     } catch (error) {
       setError(true);
       setMessage(error.response.data.errorDetails.detail);
@@ -129,7 +129,7 @@ DateMenuCard.propTypes = {
   text: PropTypes.string,
   task: PropTypes.object,
   keyUpdate: PropTypes.string,
-  setShowAlert: PropTypes.func,
+  // setShowAlert: PropTypes.func,
 };
 
 export default DateMenuCard;

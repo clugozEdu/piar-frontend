@@ -6,7 +6,7 @@ import { getColorsScheme } from "@/utilities/helpers";
 import { putData } from "@/services/api";
 import PropTypes from "prop-types";
 
-const MenuCards = ({ task, statusTask, setShowAlert }) => {
+const MenuCards = ({ task, statusTask }) => {
   const [itemsMenu, setItemsMenu] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const theme = useTheme();
@@ -30,7 +30,7 @@ const MenuCards = ({ task, statusTask, setShowAlert }) => {
       status_id: e.currentTarget.id,
     };
     await putData(`api/clickfzt/tasks/${task.id}`, dataPost);
-    setShowAlert(true);
+    // setShowAlert(true);
     handleMenuClose();
   };
 
@@ -85,7 +85,7 @@ MenuCards.propTypes = {
   // idStatus: PropTypes.string,
   task: PropTypes.object,
   statusTask: PropTypes.array,
-  setShowAlert: PropTypes.func,
+  // setShowAlert: PropTypes.func,
 };
 
 export default MenuCards;

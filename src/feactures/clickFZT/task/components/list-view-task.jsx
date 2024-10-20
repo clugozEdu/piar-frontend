@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Accordion,
   AccordionSummary,
@@ -22,22 +22,15 @@ import TimeMenu from "@/common/components/clickFZT/time-menu";
 import DescriptionMenuCard from "@/common/components/clickFZT/description-task";
 import TableTasks from "@/common/components/clickFZT/table-task";
 import TitleMenu from "@/common/components/clickFZT/name-task";
-import useWebSocket from "@/common/hooks/web-socket";
-import { useSelector, useDispatch } from "react-redux";
-import { fetchSpaces } from "@/redux/slices/clickFZT/spaces-slices";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 const ListTask = ({
   groupedTasks,
   statusTask,
   handleAddTask,
-  setShowAlert,
   priorityTask,
 }) => {
   const theme = useTheme();
-  const message = useWebSocket();
-  const dispatch = useDispatch();
-  const { advisor } = useSelector((state) => state.loginAdvisor);
   const [animationParent] = useAutoAnimate();
 
   const [expanded, setExpanded] = useState(
@@ -59,12 +52,6 @@ const ListTask = ({
     handleAddTask(statusId);
   };
 
-  useEffect(() => {
-    if (message) {
-      dispatch(fetchSpaces(advisor.id));
-    }
-  }, [message, dispatch, setShowAlert, advisor]);
-
   const columns = [
     { id: "title", label: "Nombre" },
     { id: "description", label: "Descripción" },
@@ -83,33 +70,21 @@ const ListTask = ({
     return {
       id: task.id,
       isOverdue: isOverdue,
-      description: (
-        <DescriptionMenuCard task={task} setShowAlert={setShowAlert} />
-      ),
-      title: <TitleMenu task={task} setShowAlert={setShowAlert} />,
+      description: <DescriptionMenuCard task={task} />,
+      title: <TitleMenu task={task} />,
       start_date: (
-        <DateMenuCard
-          task={task}
-          text={"Inicio: "}
-          keyUpdate={"start_date"}
-          setShowAlert={setShowAlert}
-        />
+        <DateMenuCard task={task} text={"Inicio: "} keyUpdate={"start_date"} />
       ),
       end_date: (
-        <DateMenuCard
-          task={task}
-          keyUpdate={"end_date"}
-          setShowAlert={setShowAlert}
-        />
+        <DateMenuCard task={task} text={"Fin: "} keyUpdate={"end_date"} />
       ),
-      time_task: <TimeMenu task={task} setShowAlert={setShowAlert} />,
+      time_task: <TimeMenu task={task} />,
       status: (
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <PriorityChip
             priorityTask={priorityTask}
             priority={task.priority}
             task={task}
-            setShowAlert={setShowAlert}
           />
 
           {isOverdue && (
@@ -139,13 +114,7 @@ const ListTask = ({
           />
         </Tooltip>
       ),
-      actions: (
-        <MenuCards
-          task={task}
-          statusTask={statusTask}
-          setShowAlert={setShowAlert}
-        />
-      ),
+      actions: <MenuCards task={task} statusTask={statusTask} />,
     };
   };
 

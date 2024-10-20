@@ -17,7 +17,7 @@ import { getColorsScheme } from "@/utilities/helpers";
 import useLoading from "@/common/hooks/calllbacks/loading";
 import SnackbarMessage from "../ui/snackbar";
 
-const TitleMenu = ({ task, setShowAlert }) => {
+const TitleMenu = ({ task }) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState(null);
   const [newTitle, setNewTitle] = useState(task.title || "");
@@ -47,7 +47,7 @@ const TitleMenu = ({ task, setShowAlert }) => {
         title: newTitle,
       };
       await putData(`api/clickfzt/tasks/${task.id}`, dataPost);
-      setShowAlert(true);
+      // setShowAlert(true);
       handleMenuClose();
     } catch (error) {
       setError(true);
@@ -154,7 +154,7 @@ const TitleMenu = ({ task, setShowAlert }) => {
 // Validar las props del componente
 TitleMenu.propTypes = {
   task: PropTypes.object.isRequired,
-  setShowAlert: PropTypes.func,
+  // setShowAlert: PropTypes.func,
 };
 
 export default TitleMenu;

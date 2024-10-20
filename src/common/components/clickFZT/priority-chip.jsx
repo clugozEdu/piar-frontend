@@ -23,7 +23,7 @@ import SnackbarMessage from "../ui/snackbar";
 import useLoading from "@/common/hooks/calllbacks/loading";
 
 // Opciones de prioridad
-const PriorityChip = ({ priority, task, setShowAlert, priorityTask }) => {
+const PriorityChip = ({ priority, task, priorityTask }) => {
   // const { advisorLogin } = useUser();
   const [itemsMenu, setItemsMenu] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -61,7 +61,7 @@ const PriorityChip = ({ priority, task, setShowAlert, priorityTask }) => {
         priority_id: priorityId,
       };
       await putData(`api/clickfzt/tasks/${task.id}`, dataPost);
-      setShowAlert(true);
+      // setShowAlert(true);
       handleMenuClose();
     } catch (error) {
       setError(true);
@@ -147,7 +147,7 @@ const PriorityChip = ({ priority, task, setShowAlert, priorityTask }) => {
 PriorityChip.propTypes = {
   priority: PropTypes.object,
   task: PropTypes.object,
-  setShowAlert: PropTypes.func,
+  // setShowAlert: PropTypes.func,
   priorityTask: PropTypes.array,
 };
 

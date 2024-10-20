@@ -29,7 +29,7 @@ const TaskCard = ({
   task,
   isOverdue,
   statusTask,
-  setShowAlert,
+  // setShowAlert,
   priorityTask,
 }) => {
   // const { spacingId } = useParams();
@@ -74,7 +74,7 @@ const TaskCard = ({
               alignItems="center"
             >
               {/* Nombre de la tarea */}
-              <TitleMenu task={task} setShowAlert={setShowAlert} />
+              <TitleMenu task={task} />
               {/* Botones Delete y Mover Tarea */}
               <Box display="flex">
                 <IconButton
@@ -101,7 +101,7 @@ const TaskCard = ({
                   // idStatus={task.status.id}
                   task={task}
                   statusTask={statusTask}
-                  setShowAlert={setShowAlert}
+                  // setShowAlert={setShowAlert}
                 />
               </Box>
             </Grid>
@@ -126,7 +126,7 @@ const TaskCard = ({
               <DescriptionMenuCard
                 task={task}
                 // taskID={task.id}
-                setShowAlert={setShowAlert}
+                // setShowAlert={setShowAlert}
               />
             </Grid>
 
@@ -138,7 +138,7 @@ const TaskCard = ({
                 text={"Inicio: "}
                 // taskID={task.id}
                 keyUpdate={"start_date"}
-                setShowAlert={setShowAlert}
+                // setShowAlert={setShowAlert}
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
@@ -148,13 +148,13 @@ const TaskCard = ({
                 text={"Fin: "}
                 // taskID={task.id}
                 keyUpdate={"end_date"}
-                setShowAlert={setShowAlert}
+                // setShowAlert={setShowAlert}
               />
             </Grid>
 
             {/* Tiempo dedicado a la tarea */}
             <Grid size={{ xs: 12 }}>
-              <TimeMenu task={task} setShowAlert={setShowAlert} />
+              <TimeMenu task={task} />
             </Grid>
 
             {/* Información de estado, prioridad y usuario */}
@@ -164,7 +164,7 @@ const TaskCard = ({
                 priorityTask={priorityTask}
                 priority={task.priority}
                 task={task}
-                setShowAlert={setShowAlert}
+                // setShowAlert={setShowAlert}
               />
             </Grid>
 
@@ -221,7 +221,7 @@ TaskCard.propTypes = {
   task: PropTypes.object.isRequired,
   isOverdue: PropTypes.bool,
   statusTask: PropTypes.array,
-  setShowAlert: PropTypes.func,
+  // setShowAlert: PropTypes.func,
   priorityTask: PropTypes.array,
 };
 

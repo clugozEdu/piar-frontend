@@ -12,7 +12,6 @@ import Swal from "sweetalert2";
 
 const AddTask = ({
   openDialog,
-  setShowAlert,
   setIsDialogOpen,
   idStatus,
   idList,
@@ -125,7 +124,6 @@ const AddTask = ({
     try {
       await postData("api/clickfzt/tasks", values);
       setIsDialogOpen(false);
-      setShowAlert(true);
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -214,7 +212,6 @@ const AddTask = ({
 AddTask.propTypes = {
   statusTask: PropTypes.array.isRequired,
   openDialog: PropTypes.bool.isRequired,
-  setShowAlert: PropTypes.func.isRequired,
   idStatus: PropTypes.string.isRequired,
   idList: PropTypes.string, // Ahora es opcional
   lists: PropTypes.array, // Solo necesario si se usa desde un espacio

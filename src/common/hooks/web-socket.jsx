@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setAlert } from "../../redux/slices/alert-slice";
+import { fetchSpaces } from "@/redux/slices/clickFZT/spaces-slices";
 
 /** Hook useWebSocket
  * Hook to manage a WebSocket connection
@@ -47,6 +48,7 @@ const useWebSocket = () => {
         if (data.advisor_id === advisorLogin.id) {
           dispatch(setAlert(data));
         }
+        dispatch(fetchSpaces(advisorLogin.id));
       } catch (error) {
         console.error("Error parsing WebSocket message: ", error);
       }

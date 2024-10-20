@@ -57,7 +57,7 @@ function App() {
           onCloseHandler={() => {
             dispatch(clearAlert());
           }}
-          duration={3000}
+          duration={2500}
           severity="success"
           vertical="bottom"
           horizontal="right"

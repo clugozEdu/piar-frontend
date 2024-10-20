@@ -11,7 +11,6 @@ const BoardTask = ({
   groupedTasks,
   statusTask,
   handleAddTask,
-  setShowAlert,
   priorityTask,
 }) => {
   const theme = useTheme();
@@ -114,7 +113,6 @@ const BoardTask = ({
                 key={task.id}
                 task={task}
                 isOverdue={task.overdue}
-                setShowAlert={setShowAlert}
                 priorityTask={priorityTask}
               />
             ))}
@@ -130,7 +128,6 @@ BoardTask.propTypes = {
   statusTask: PropTypes.array.isRequired,
   handleAddTask: PropTypes.func.isRequired,
   priorityTask: PropTypes.array.isRequired,
-  setShowAlert: PropTypes.func,
 };
 
 export default BoardTask;

@@ -31,6 +31,7 @@ import useLoading from "@/common/hooks/calllbacks/loading";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchSpaces } from "@/redux/slices/clickFZT/spaces-slices";
 import PropTypes from "prop-types";
+import EditSpacing from "../edit-spaces";
 
 const ListSideClickFZT = ({ advisorLogin }) => {
   const [open, setOpen] = useState({});
@@ -106,12 +107,17 @@ const ListSideClickFZT = ({ advisorLogin }) => {
   const getDialogComponent = () => {
     switch (contextDialog) {
       case "createSpacing":
-      case "editSpacing":
         return (
           <AddSpacing
             openDialog={isDialogOpen}
             setOpenDialog={setIsDialogOpen}
-            context={contextDialog}
+          />
+        );
+      case "editSpacing":
+        return (
+          <EditSpacing
+            openDialog={isDialogOpen}
+            setOpenDialog={setIsDialogOpen}
             idSpacing={selectedSpacing}
           />
         );

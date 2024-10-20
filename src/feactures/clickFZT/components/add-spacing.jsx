@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Box,
   Typography,
@@ -13,56 +13,24 @@ import { Save, Pencil, FolderPlus } from "lucide-react";
 import FormInit from "@/common/components/form/form-init";
 import CreateDialog from "./create-dialog";
 import SpacingForm from "../forms/spacing-form";
-import { postData, getData, putData } from "@/services/api";
+import { postData } from "@/services/api";
 import useLoading from "@/common/hooks/calllbacks/loading";
 import SnackbarMessage from "@/common/components/ui/snackbar";
 import PropTypes from "prop-types";
 
-const AddSpacing = ({
-  openDialog,
-  setOpenDialog,
-  // setShowAlert,
-  context,
-  idSpacing,
-}) => {
-  const [initValues, setInitValues] = useState(null);
-  const [isLoadingDialog, setLoadingDialog] = useState(
-    context === "editSpacing"
-  );
+const AddSpacing = ({ openDialog, setOpenDialog }) => {
+  const [contextDialog, setContextDialog] = useState("");
   const { setIsLoading } = useLoading();
   const theme = useTheme();
 
+  const initValues = {
+    title: "",
+    description: "",
+    advisor_ids: [],
+  };
+
   /** Estado para controlar si se ha intentado hacer submit */
   const [hasSubmitted, setHasSubmitted] = useState(false);
-
-  useEffect(() => {
-    if (context === "editSpacing") {
-      try {
-        getData(`api/clickfzt/spacing/${idSpacing}`).then((data) => {
-          const spacing = data;
-          setInitValues({
-            title: spacing.title,
-            description: spacing.description,
-            advisor_ids: spacing.advisors.map((advisor) => advisor.id),
-          });
-          setLoadingDialog(false);
-        });
-      } catch (error) {
-        Swal.fire({
-          icon: "error",
-          title: "Error al obtener el espacio",
-          text: error.message,
-        });
-      }
-    } else {
-      setInitValues({
-        title: "",
-        description: "",
-        advisor_ids: [],
-      });
-      setLoadingDialog(false);
-    }
-  }, [context, idSpacing]);
 
   const validateShemaSpacing = () =>
     Yup.object({
@@ -73,12 +41,13 @@ const AddSpacing = ({
 
   const handleClose = () => {
     setOpenDialog(false);
+    setContextDialog("");
   };
 
   return (
     <CreateDialog
       title={
-        context === "createSpacing" ? (
+        contextDialog === "createSpacing" ? (
           <>
             <Box display={"flex"} alignItems={"center"}>
               <FolderPlus size={24} color={theme.palette.primary.main} />
@@ -104,91 +73,84 @@ const AddSpacing = ({
       }
       open={openDialog}
       onClose={handleClose}
-      isLoading={isLoadingDialog}
+      isLoading={false}
     >
-      {!isLoadingDialog && initValues && (
-        <FormInit
-          initialValues={initValues}
-          validationSchema={validateShemaSpacing}
-          onSubmit={async (values, actions) => {
-            setIsLoading(true);
-            try {
-              if (context === "editSpacing") {
-                await putData(`api/clickfzt/spacing/${idSpacing}`, values);
-              } else {
-                await postData("api/clickfzt/spacing/", values);
-              }
-              setOpenDialog(false);
-              // setShowAlert(true);
-            } catch (error) {
-              Swal.fire({
-                icon: "error",
-                title: "Error al guardar el espacio",
-                text: error.message,
-              });
-            } finally {
-              actions.setSubmitting(false);
-              setIsLoading(false);
-            }
-          }}
-          enableReinitialize={true}
-        >
-          {({ isSubmitting, handleSubmit, errors }) => (
-            <>
-              <SpacingForm />
-              <DialogActions
+      <FormInit
+        initialValues={initValues}
+        validationSchema={validateShemaSpacing}
+        onSubmit={async (values, actions) => {
+          setIsLoading(true);
+          try {
+            await postData("api/clickfzt/spacing/", values);
+            setOpenDialog(false);
+          } catch (error) {
+            Swal.fire({
+              icon: "error",
+              title: "Error al guardar el espacio",
+              text: error.message,
+            });
+          } finally {
+            actions.setSubmitting(false);
+            setIsLoading(false);
+          }
+        }}
+        enableReinitialize={true}
+      >
+        {({ isSubmitting, handleSubmit, errors }) => (
+          <>
+            <SpacingForm />
+            <DialogActions
+              sx={{
+                pt: 2,
+                display: "flex",
+                justifyContent: "flex-end",
+              }}
+            >
+              <Button
+                type="button"
+                variant="contained"
+                disabled={isSubmitting}
+                onClick={() => {
+                  setHasSubmitted(true); // Marcar que se ha intentado hacer submit
+                  handleSubmit();
+                }}
+                startIcon={
+                  isSubmitting ? (
+                    <CircularProgress size={24} />
+                  ) : (
+                    <Save size={24} />
+                  )
+                }
                 sx={{
-                  pt: 2,
-                  display: "flex",
-                  justifyContent: "flex-end",
+                  backgroundColor: "#0dac3a",
+                  "&:hover": {
+                    backgroundColor: "#075f20",
+                  },
                 }}
               >
-                <Button
-                  type="button"
-                  variant="contained"
-                  disabled={isSubmitting}
-                  onClick={() => {
-                    setHasSubmitted(true); // Marcar que se ha intentado hacer submit
-                    handleSubmit();
-                  }}
-                  startIcon={
-                    isSubmitting ? (
-                      <CircularProgress size={24} />
-                    ) : (
-                      <Save size={24} />
-                    )
-                  }
-                  sx={{
-                    backgroundColor: "#0dac3a",
-                    "&:hover": {
-                      backgroundColor: "#075f20",
-                    },
-                  }}
-                >
-                  {isSubmitting ? "Guardando..." : "Guardar Espacio"}
-                </Button>
-              </DialogActions>
+                {isSubmitting ? "Guardando..." : "Guardar Espacio"}
+              </Button>
+            </DialogActions>
 
-              {/* Mostrar Snackbar solo si se ha hecho submit y hay errores */}
-              {hasSubmitted &&
-                Object.keys(errors).map((errorKey, index) => (
-                  <SnackbarMessage
-                    key={index}
-                    open={true}
-                    message={errors[errorKey].toString()}
-                    severity="error"
-                    onCloseHandler={() => {
-                      setHasSubmitted(false);
-                    }}
-                    duration={3000}
-                    vertical="bottom"
-                    horizontal="right"
-                  />
-                ))}
-            </>
-          )}
-        </FormInit>
-      )}
+            {/* Mostrar Snackbar solo si se ha hecho submit y hay errores */}
+            {hasSubmitted &&
+              Object.keys(errors).map((errorKey, index) => (
+                <SnackbarMessage
+                  key={index}
+                  open={true}
+                  message={errors[errorKey].toString()}
+                  severity="error"
+                  onCloseHandler={() => {
+                    setHasSubmitted(false);
+                  }}
+                  duration={3000}
+                  vertical="bottom"
+                  horizontal="right"
+                />
+              ))}
+          </>
+        )}
+      </FormInit>
     </CreateDialog>
   );
 };
