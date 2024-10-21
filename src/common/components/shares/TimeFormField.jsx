@@ -45,14 +45,14 @@ function TimeFormField({ xs = 12, sm = 12, md = 6, lg = 3, ...props }) {
                     <AccessTimeIcon />
                   </InputAdornment>
                 ),
+                error: !!(meta.touched && meta.error),
+                helperText: meta.touched && meta.error ? meta.error : "",
               },
             },
           }}
           onChange={handleChange}
           value={field.value ? new Date(`1970-01-01T${field.value}`) : null}
           autoOk
-          error={!!(meta.touched && meta.error)}
-          helperText={meta.touched && meta.error}
           {...props}
           sx={{
             "& .MuiInputBase-root": {

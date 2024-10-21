@@ -15,10 +15,11 @@ import CreateDialog from "./create-dialog";
 import SpacingForm from "../forms/spacing-form";
 import { postData } from "@/services/api";
 import useLoading from "@/common/hooks/calllbacks/loading";
-import SnackbarMessage from "@/common/components/ui/snackbar";
+import { useSnackbar } from "notistack";
 import PropTypes from "prop-types";
 
 const AddSpacing = ({ openDialog, setOpenDialog }) => {
+  const { enqueueSnackbar } = useSnackbar();
   const [contextDialog, setContextDialog] = useState("");
   const { setIsLoading } = useLoading();
   const theme = useTheme();
@@ -30,7 +31,6 @@ const AddSpacing = ({ openDialog, setOpenDialog }) => {
   };
 
   /** Estado para controlar si se ha intentado hacer submit */
-  const [hasSubmitted, setHasSubmitted] = useState(false);
 
   const validateShemaSpacing = () =>
     Yup.object({
@@ -96,7 +96,7 @@ const AddSpacing = ({ openDialog, setOpenDialog }) => {
         }}
         enableReinitialize={true}
       >
-        {({ isSubmitting, handleSubmit, errors }) => (
+        {({ isSubmitting, handleSubmit, validateForm, setTouched }) => (
           <>
             <SpacingForm />
             <DialogActions
@@ -110,9 +110,32 @@ const AddSpacing = ({ openDialog, setOpenDialog }) => {
                 type="button"
                 variant="contained"
                 disabled={isSubmitting}
-                onClick={() => {
-                  setHasSubmitted(true); // Marcar que se ha intentado hacer submit
-                  handleSubmit();
+                onClick={async () => {
+                  const formErrors = await validateForm();
+                  if (Object.keys(formErrors).length === 0) {
+                    handleSubmit();
+                  } else {
+                    // Marcar todos los campos con errores como tocados
+                    const touchedFields = Object.keys(formErrors).reduce(
+                      (acc, field) => {
+                        acc[field] = true;
+                        return acc;
+                      },
+                      {}
+                    );
+                    setTouched(touchedFields);
+
+                    Object.values(formErrors).forEach((error) => {
+                      enqueueSnackbar(error, {
+                        variant: "error",
+                        autoHideDuration: 3000,
+                        anchorOrigin: {
+                          vertical: "bottom",
+                          horizontal: "left",
+                        },
+                      });
+                    });
+                  }
                 }}
                 startIcon={
                   isSubmitting ? (
@@ -131,23 +154,6 @@ const AddSpacing = ({ openDialog, setOpenDialog }) => {
                 {isSubmitting ? "Guardando..." : "Guardar Espacio"}
               </Button>
             </DialogActions>
-
-            {/* Mostrar Snackbar solo si se ha hecho submit y hay errores */}
-            {hasSubmitted &&
-              Object.keys(errors).map((errorKey, index) => (
-                <SnackbarMessage
-                  key={index}
-                  open={true}
-                  message={errors[errorKey].toString()}
-                  severity="error"
-                  onCloseHandler={() => {
-                    setHasSubmitted(false);
-                  }}
-                  duration={3000}
-                  vertical="bottom"
-                  horizontal="right"
-                />
-              ))}
           </>
         )}
       </FormInit>

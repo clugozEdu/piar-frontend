@@ -9,14 +9,13 @@ import { formatDate, getColorsScheme } from "@/utilities/helpers";
 import PropTypes from "prop-types";
 import { putData } from "@/services/api";
 import useLoading from "@/common/hooks/calllbacks/loading";
-import SnackbarMessage from "../ui/snackbar";
+import { useSnackbar } from "notistack";
 
-const DateMenuCard = ({ text, task, keyUpdate }) => {
+const DateMenuCard = ({ text, task, keyUpdate, keyValidate }) => {
   const theme = useTheme();
+  const { enqueueSnackbar } = useSnackbar();
   const [anchorEl, setAnchorEl] = useState(null);
   const [dateVisit, setDateVisit] = useState(task[keyUpdate]);
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState(false);
   const { setIsLoading } = useLoading();
 
   useEffect(() => {
@@ -30,19 +29,59 @@ const DateMenuCard = ({ text, task, keyUpdate }) => {
 
   const handleDateChange = async (newValue) => {
     handleMenuClose();
+
+    const formatNewValue = newValue ? new Date(newValue) : null;
+
+    // Perform validation
+    let isValid = true;
+    let errorMessage = "";
+
+    const validateDate = task[keyValidate] ? new Date(task[keyValidate]) : null;
+
+    if (keyUpdate === "start_date") {
+      if (validateDate && formatNewValue && formatNewValue > validateDate) {
+        isValid = false;
+        errorMessage =
+          "La fecha de inicio no puede ser mayor que la fecha de fin";
+      }
+    } else if (keyUpdate === "end_date") {
+      if (validateDate && formatNewValue && formatNewValue < validateDate) {
+        isValid = false;
+        errorMessage =
+          "La fecha de fin no puede ser menor que la fecha de inicio";
+      }
+    }
+
+    if (!isValid) {
+      // Show error message using enqueueSnackbar
+      enqueueSnackbar(errorMessage, {
+        variant: "error",
+        autoHideDuration: 3000,
+        anchorOrigin: { vertical: "bottom", horizontal: "right" },
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    // Proceed with API call
     setIsLoading(true);
     try {
       setDateVisit(newValue);
-      const formatNewValue = newValue ? new Date(newValue) : null;
       const dataPost = {
         [keyUpdate]: formatNewValue,
       };
       await putData(`api/clickfzt/tasks/${task.id}`, dataPost);
-      // setShowAlert(true);
     } catch (error) {
-      setError(true);
-      setMessage(error.response.data.errorDetails.detail);
-      handleMenuClose();
+      // Show error message from API error
+      const apiErrorMessage =
+        error.response?.data?.errorDetails?.detail ||
+        "Error al actualizar la fecha";
+      enqueueSnackbar(apiErrorMessage, {
+        variant: "error",
+        autoHideDuration: 3000,
+        anchorOrigin: { vertical: "bottom", horizontal: "right" },
+      });
+    } finally {
       setIsLoading(false);
     }
   };
@@ -105,31 +144,16 @@ const DateMenuCard = ({ text, task, keyUpdate }) => {
           </LocalizationProvider>
         </Box>
       </Menu>
-      {error && (
-        <SnackbarMessage
-          open={error}
-          message={`${message}`}
-          title={"Error"}
-          onCloseHandler={() => {
-            setError(false);
-          }}
-          duration={3000}
-          severity="error"
-          vertical="bottom"
-          horizontal="right"
-        />
-      )}
     </>
   );
 };
 
-// Validar las props del componente
+// Validate the component's props
 DateMenuCard.propTypes = {
-  date: PropTypes.string,
-  text: PropTypes.string,
-  task: PropTypes.object,
-  keyUpdate: PropTypes.string,
-  // setShowAlert: PropTypes.func,
+  text: PropTypes.string.isRequired,
+  task: PropTypes.object.isRequired,
+  keyUpdate: PropTypes.string.isRequired,
+  keyValidate: PropTypes.string.isRequired,
 };
 
 export default DateMenuCard;

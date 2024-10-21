@@ -86,7 +86,6 @@ const TaskCard = ({
                     borderRadius: 1,
                   }}
                   onClick={handlerDeleteTask}
-                  // disableRipple={true}
                 >
                   <Trash2
                     size={20}
@@ -97,12 +96,7 @@ const TaskCard = ({
                   />
                 </IconButton>
                 {/* Menú de opciones para mover la tarea */}
-                <MenuCards
-                  // idStatus={task.status.id}
-                  task={task}
-                  statusTask={statusTask}
-                  // setShowAlert={setShowAlert}
-                />
+                <MenuCards task={task} statusTask={statusTask} />
               </Box>
             </Grid>
 
@@ -111,44 +105,31 @@ const TaskCard = ({
             </Grid>
 
             <Grid size={{ xs: 12, sm: 12 }}>
-              <Typography
-                variant="body2"
-                color="textSecondary"
-                // component={Link}
-                // to={`clickFZT/spacing/${spacingId}/list/${task.list_id}`}
-              >
+              <Typography variant="body2" color="textSecondary">
                 {`En ${task.list_title}`}
               </Typography>
             </Grid>
 
             {/* Descripción de la tarea */}
             <Grid size={{ xs: 12, sm: 12 }}>
-              <DescriptionMenuCard
-                task={task}
-                // taskID={task.id}
-                // setShowAlert={setShowAlert}
-              />
+              <DescriptionMenuCard task={task} />
             </Grid>
 
             {/* Fechas de inicio y fin */}
             <Grid size={{ xs: 12, sm: 6 }}>
               <DateMenuCard
                 task={task}
-                // date={task.start_date}
                 text={"Inicio: "}
-                // taskID={task.id}
                 keyUpdate={"start_date"}
-                // setShowAlert={setShowAlert}
+                keyValidate={"end_date"}
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
               <DateMenuCard
                 task={task}
-                // date={task.end_date}
                 text={"Fin: "}
-                // taskID={task.id}
                 keyUpdate={"end_date"}
-                // setShowAlert={setShowAlert}
+                keyValidate={"start_date"}
               />
             </Grid>
 
@@ -164,7 +145,6 @@ const TaskCard = ({
                 priorityTask={priorityTask}
                 priority={task.priority}
                 task={task}
-                // setShowAlert={setShowAlert}
               />
             </Grid>
 

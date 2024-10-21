@@ -24,13 +24,17 @@ function DateFormField({ xs = 12, sm = 12, md = 6, lg = 3, ...props }) {
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <DatePicker
           variant="inline"
-          slotProps={{ textField: { fullWidth: true } }}
+          slotProps={{
+            textField: {
+              fullWidth: true,
+              error: !!(meta.touched && meta.error),
+              // helperText: meta.touched && meta.error ? meta.error : "", // Mostrar el texto de error
+            },
+          }}
           onChange={handleDateChange}
           value={field.value || null}
           format="dd/MM/yyyy"
           autoOk
-          error={!!(meta.touched && meta.error)}
-          helperText={meta.touched && meta.error}
           {...props}
           sx={{
             "& .MuiInputBase-root": {

@@ -9,6 +9,7 @@ import FormInit from "@/common/components/form/form-init";
 import { getData, postData } from "@/services/api";
 import TaskForm from "../forms/task-form";
 import Swal from "sweetalert2";
+import { useSnackbar } from "notistack";
 
 const AddTask = ({
   openDialog,
@@ -18,6 +19,7 @@ const AddTask = ({
   lists = [],
   statusTask,
 }) => {
+  const { enqueueSnackbar } = useSnackbar();
   const [nameList, setListName] = useState("");
   const [isLoadingDialog, setLoadingDialog] = useState(true);
 
@@ -49,75 +51,39 @@ const AddTask = ({
     }
   }, [idList, setIsDialogOpen]);
 
-  const validateSchemaTask = () => {
-    // Busca el estado de "Backlog" en el array statusTask
-    const isBacklog = statusTask.find(
-      (status) => status.id === idStatus && status.name === "Backlog"
-    );
+  // Determine if the current status is "Backlog"
+  const isBacklog = statusTask.some(
+    (status) => status.id === idStatus && status.name === "Backlog"
+  );
 
-    return Yup.object()
-      .shape({
-        title: Yup.string().required("El título es requerido"),
-        description: Yup.string().notRequired(),
-        start_date: Yup.date().nullable().notRequired(),
-        end_date: Yup.date()
-          .notRequired("La fecha de finalización es requerida")
-          .test(
-            "is-greater",
-            "La fecha de finalización debe ser posterior a la fecha de inicio",
-            function (value) {
-              const { start_date } = this.parent;
-              return value >= start_date;
-            }
-          ),
-        time_task: Yup.string().notRequired(),
-        status_id: Yup.string().required("El id del estado es requerido"),
-        priority_id: Yup.string().nullable().notRequired(),
-        list_id: Yup.string().required("El id de la lista es requerido"),
-      })
-      .test("conditional-validation", null, function (values) {
-        const { title, description, start_date, end_date, priority_id } =
-          values;
-
-        // Si es "Backlog", solo validar el título
-        if (isBacklog) {
-          if (!title) {
-            return this.createError({
-              path: "title",
-              message: "El título es requerido",
-            });
-          }
-          return true; // No se validan los demás campos
-        }
-
-        // Si no es "Backlog", validar que todos los campos requeridos estén presentes
-        if (!description) {
-          return this.createError({
-            path: "description",
-            message: "La descripción es requerida",
-          });
-        }
-        if (!start_date) {
-          return this.createError({
-            path: "start_date",
-            message: "La fecha de inicio es requerida",
-          });
-        }
-        if (!end_date) {
-          return this.createError({
-            path: "end_date",
-            message: "La fecha de finalización es requerida",
-          });
-        }
-        if (!priority_id) {
-          return this.createError({
-            path: "priority_id",
-            message: "El id de la prioridad es requerido",
-          });
-        }
-
-        return true;
-      });
+  const validateSchemaTask = (isBacklog) => {
+    return Yup.object().shape({
+      title: Yup.string().required("El título es requerido"),
+      description: Yup.string().notRequired(),
+      start_date: !isBacklog
+        ? Yup.date().nullable().required("La fecha de inicio es requerida")
+        : Yup.date().nullable().notRequired(),
+      end_date: !isBacklog
+        ? Yup.date()
+            .nullable()
+            .required("La fecha de finalización es requerida")
+            .min(
+              Yup.ref("start_date"),
+              "La fecha de finalización debe ser posterior a la fecha de inicio"
+            )
+        : Yup.date().nullable().notRequired(),
+      time_task: !isBacklog
+        ? Yup.number()
+            .nullable()
+            .required("El tiempo de tarea es requerido")
+            .moreThan(0, "El tiempo de tarea debe ser mayor a 0")
+        : Yup.number().nullable().notRequired(),
+      priority_id: !isBacklog
+        ? Yup.string().required("Debe de seleccionar una prioridad")
+        : Yup.string().nullable().notRequired(),
+      status_id: Yup.string().required("El id del estado es requerido"),
+      list_id: Yup.string().required("El id de la lista es requerido"),
+    });
   };
 
   const handleSubmitForm = async (values, actions) => {
@@ -145,11 +111,11 @@ const AddTask = ({
       {!isLoadingDialog && (
         <FormInit
           initialValues={initValues}
-          validationSchema={validateSchemaTask}
+          validationSchema={() => validateSchemaTask(isBacklog)}
           onSubmit={(values, actions) => handleSubmitForm(values, actions)}
           enableReinitialize={true}
         >
-          {({ isSubmitting, handleSubmit }) => (
+          {({ isSubmitting, handleSubmit, validateForm, setTouched }) => (
             <>
               {/* Mostrar el Select solo si no se ha proporcionado idList */}
               {!idList && (
@@ -183,7 +149,33 @@ const AddTask = ({
                   type="button"
                   variant="contained"
                   disabled={isSubmitting}
-                  onClick={handleSubmit}
+                  onClick={async () => {
+                    const formErrors = await validateForm();
+                    if (Object.keys(formErrors).length === 0) {
+                      handleSubmit();
+                    } else {
+                      // Marcar todos los campos con errores como tocados
+                      const touchedFields = Object.keys(formErrors).reduce(
+                        (acc, field) => {
+                          acc[field] = true;
+                          return acc;
+                        },
+                        {}
+                      );
+                      setTouched(touchedFields);
+
+                      Object.values(formErrors).forEach((error) => {
+                        enqueueSnackbar(error, {
+                          variant: "error",
+                          autoHideDuration: 3000,
+                          anchorOrigin: {
+                            vertical: "bottom",
+                            horizontal: "left",
+                          },
+                        });
+                      });
+                    }
+                  }}
                   startIcon={
                     isSubmitting ? (
                       <CircularProgress size={24} />

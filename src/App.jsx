@@ -1,69 +1,42 @@
 import { useState, useEffect } from "react";
 import { CssBaseline } from "@mui/material";
-import SnackbarMessage from "./common/components/ui/snackbar";
 import { useSelector, useDispatch } from "react-redux";
 import { clearAlert } from "./redux/slices/alert-slice";
 import AppBarSite from "./common/components/layout/app-bar-site";
 import useWebSocket from "./common/hooks/web-socket";
-
-/** Component App
- * Render the AppBarSite component
- * @return {component}
- */
+import { useSnackbar } from "notistack";
 
 function App() {
-  /** Init state the component */
   const dispatch = useDispatch();
+  const { enqueueSnackbar } = useSnackbar();
   const [advisorLogin, setAdvisorLogin] = useState([]);
   const { advisor } = useSelector((state) => state.loginAdvisor);
   const { showAlert, messageAlert } = useSelector((state) => state.alertWS);
 
   useWebSocket();
 
-  /** UseEffect to set the advisor login */
   useEffect(() => {
     setAdvisorLogin([advisor]);
   }, [advisor]);
 
-  console.log(messageAlert);
+  useEffect(() => {
+    if (showAlert && messageAlert) {
+      enqueueSnackbar(messageAlert, {
+        variant: "success",
+        autoHideDuration: 2500,
+        anchorOrigin: {
+          vertical: "bottom",
+          horizontal: "left",
+        },
+      });
+
+      // Limpiar la alerta después de mostrar el snackbar
+      dispatch(clearAlert());
+    }
+  }, [showAlert, messageAlert, enqueueSnackbar, dispatch]);
 
   return (
     <>
-      {/* Mostrar el Snackbar global */}
-      {showAlert && (
-        <SnackbarMessage
-          open={showAlert}
-          message={
-            messageAlert.event === "task_created"
-              ? "Tarea creada con éxito"
-              : messageAlert.event === "task_deleted"
-              ? "Tarea eliminada con éxito"
-              : messageAlert.event === "task_updated"
-              ? "Tarea actualizada con éxito"
-              : messageAlert.event === "spacing_updated"
-              ? "Espacio actualizado con éxito"
-              : messageAlert.event === "spacing_deleted"
-              ? "Espacio eliminado con éxito"
-              : messageAlert.event === "spacing_created"
-              ? "Espacio creado con éxito"
-              : messageAlert.event === "list_updated"
-              ? "Lista actualizada con éxito"
-              : messageAlert.event === "list_deleted"
-              ? "Lista eliminada con éxito"
-              : messageAlert.event === "list_created"
-              ? "Lista creada con éxito"
-              : ""
-          }
-          onCloseHandler={() => {
-            dispatch(clearAlert());
-          }}
-          duration={2500}
-          severity="success"
-          vertical="bottom"
-          horizontal="right"
-        />
-      )}
-      {/* Init Layout */}
       <CssBaseline />
       {advisorLogin.length > 0 && <AppBarSite advisor={advisorLogin} />}
     </>

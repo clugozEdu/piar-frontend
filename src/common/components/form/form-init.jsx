@@ -26,8 +26,24 @@ const FormInit = ({ initialValues, validationSchema, onSubmit, children }) => {
        * @param {object} errors - Errors of the form
        * @param {boolean} isSubmitting - Submitting status
        */}
-      {({ values, errors, isSubmitting, handleSubmit }) => (
-        <Form>{children({ values, errors, isSubmitting, handleSubmit })}</Form>
+      {({
+        values,
+        errors,
+        isSubmitting,
+        handleSubmit,
+        validateForm,
+        setTouched,
+      }) => (
+        <Form>
+          {children({
+            values,
+            errors,
+            isSubmitting,
+            handleSubmit,
+            validateForm,
+            setTouched,
+          })}
+        </Form>
       )}
     </Formik>
   );

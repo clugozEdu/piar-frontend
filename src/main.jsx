@@ -4,6 +4,7 @@ import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { RouterProvider } from "react-router-dom";
 import { LoadingProvider } from "./common/hooks/use-loading-context.jsx";
+import { SnackbarProvider } from "notistack";
 import store from "./redux/store.js";
 import router from "./routes/routes.jsx";
 
@@ -68,12 +69,14 @@ const theme = createTheme({
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <ThemeProvider theme={theme}>
-      <LoadingProvider>
-        <Provider store={store}>
-          <RouterProvider router={router} />
-        </Provider>
-      </LoadingProvider>
-    </ThemeProvider>
+    <SnackbarProvider preventDuplicate maxSnack={5}>
+      <ThemeProvider theme={theme}>
+        <LoadingProvider>
+          <Provider store={store}>
+            <RouterProvider router={router} />
+          </Provider>
+        </LoadingProvider>
+      </ThemeProvider>
+    </SnackbarProvider>
   </StrictMode>
 );

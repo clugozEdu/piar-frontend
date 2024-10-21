@@ -26,23 +26,7 @@ const handleDelete = (
     animation: true,
   }).then(async (result) => {
     if (result.isConfirmed) {
-      await deleteData(pathDelete)
-        .then(() => {
-          Swal.fire(
-            "Eliminado",
-            `El elemento ${nameItem} ha sido eliminado`,
-            "success"
-          );
-          // setRedirect(true);
-        })
-        .catch((error) => {
-          Swal.fire({
-            title: "Error",
-            text: `${error.response.data.errorDetails.detail}`,
-            icon: "error",
-            animation: true,
-          });
-        });
+      await deleteData(pathDelete);
     }
   });
   handleOpen(false);

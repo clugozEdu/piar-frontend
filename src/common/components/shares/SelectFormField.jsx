@@ -48,7 +48,7 @@ const SelectFormField = ({
       <TextField
         fullWidth
         select
-        helperText={meta.touched && meta.error}
+        // helperText={meta.touched && meta.error}
         error={!!(meta.touched && meta.error)}
         {...field}
         {...props}

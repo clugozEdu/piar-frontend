@@ -12,10 +12,10 @@ import * as Yup from "yup";
 import Swal from "sweetalert2";
 import { getData, postData, putData } from "@/services/api";
 import FormInit from "@/common/components/form/form-init";
-import SnackbarMessage from "@/common/components/ui/snackbar";
 import useLoading from "@/common/hooks/calllbacks/loading";
 import CreateDialog from "./create-dialog";
 import ListForm from "../forms/list-form";
+import { useSnackbar } from "notistack";
 import PropTypes from "prop-types";
 
 const AddList = ({
@@ -26,6 +26,7 @@ const AddList = ({
   idSpacing,
   idList,
 }) => {
+  const { enqueueSnackbar } = useSnackbar();
   const theme = useTheme();
   const { setIsLoading } = useLoading();
   const [nameSpacing, setNameSpacing] = useState("");
@@ -38,9 +39,6 @@ const AddList = ({
   const [isLoadingDialog, setisLoadingDialog] = useState(
     context === "editList"
   );
-
-  /** Estado para controlar si se ha intentado hacer submit */
-  const [hasSubmitted, setHasSubmitted] = useState(false);
 
   useEffect(() => {
     if (context === "editList") {
@@ -145,7 +143,7 @@ const AddList = ({
           }}
           enableReinitialize={true}
         >
-          {({ isSubmitting, handleSubmit, errors }) => (
+          {({ isSubmitting, handleSubmit, validateForm, setTouched }) => (
             <>
               <ListForm idSpacing={idSpacing} setNameSpacing={setNameSpacing} />
               <DialogActions
@@ -159,9 +157,32 @@ const AddList = ({
                   type="button"
                   variant="contained"
                   disabled={isSubmitting}
-                  onClick={() => {
-                    setHasSubmitted(true); // Marcar que se ha intentado hacer submit
-                    handleSubmit();
+                  onClick={async () => {
+                    const formErrors = await validateForm();
+                    if (Object.keys(formErrors).length === 0) {
+                      handleSubmit();
+                    } else {
+                      // Marcar todos los campos con errores como tocados
+                      const touchedFields = Object.keys(formErrors).reduce(
+                        (acc, field) => {
+                          acc[field] = true;
+                          return acc;
+                        },
+                        {}
+                      );
+                      setTouched(touchedFields);
+
+                      Object.values(formErrors).forEach((error) => {
+                        enqueueSnackbar(error, {
+                          variant: "error",
+                          autoHideDuration: 3000,
+                          anchorOrigin: {
+                            vertical: "bottom",
+                            horizontal: "left",
+                          },
+                        });
+                      });
+                    }
                   }}
                   startIcon={
                     isSubmitting ? (
@@ -180,22 +201,6 @@ const AddList = ({
                   {isSubmitting ? "Guardando..." : "Guardar Lista"}
                 </Button>
               </DialogActions>
-              {/* Mostrar Snackbar solo si se ha hecho submit y hay errores */}
-              {hasSubmitted &&
-                Object.keys(errors).map((errorKey, index) => (
-                  <SnackbarMessage
-                    key={index}
-                    open={true}
-                    message={errors[errorKey].toString()}
-                    severity="error"
-                    onCloseHandler={() => {
-                      setHasSubmitted(false);
-                    }}
-                    duration={3000}
-                    vertical="bottom"
-                    horizontal="right"
-                  />
-                ))}
             </>
           )}
         </FormInit>
