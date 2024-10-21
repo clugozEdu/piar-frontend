@@ -18,8 +18,10 @@ const tokenRefresh = (error) => {
       icon: "warning",
       confirmButtonColor: "#1f3b5a",
       confirmButtonText: "Aceptar",
-    }).then(() => {
-      store.dispatch(logout());
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        store.dispatch(logout());
+      }
     });
   }
 };

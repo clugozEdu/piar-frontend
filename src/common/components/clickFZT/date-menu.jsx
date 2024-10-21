@@ -70,6 +70,7 @@ const DateMenuCard = ({ text, task, keyUpdate, keyValidate }) => {
       const dataPost = {
         [keyUpdate]: formatNewValue,
       };
+
       await putData(`api/clickfzt/tasks/${task.id}`, dataPost);
     } catch (error) {
       // Show error message from API error

@@ -25,7 +25,7 @@ import { Link } from "react-router-dom";
 import AddSpacing from "../add-spacing";
 import AddList from "../add-lists";
 import ConfirmDeleteItems from "../delete-items";
-import SpacingSideClickFZT from "./spacing-side-click-fzt";
+import SpacingSideClickFZT from "./spaces-side-click-fzt";
 import useLoading from "@/common/hooks/calllbacks/loading";
 // redux
 import { useSelector, useDispatch } from "react-redux";
@@ -279,6 +279,7 @@ const ListSideClickFZT = ({ advisorLogin }) => {
           idElement={selectedSpacing}
           onClose={handleMenuClose}
           handleOpen={setIsDeleteConfirmOpen}
+          pathRedirect={true}
         />
       )}
     </Box>

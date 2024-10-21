@@ -191,6 +191,7 @@ const TaskCard = ({
           handleOpen={setTaskDelete}
           pathGet={`api/clickfzt/tasks/${taskDelete}`}
           pathDelete={`api/clickfzt/tasks/${taskDelete}`}
+          pathRedirect={false}
         />
       )}
     </>

@@ -65,6 +65,7 @@ const SpacingSideClickFZT = ({
             setSelectedSpacing("");
           }}
           idElement={selectedList}
+          pathRedirect={false}
         />
       )}
 

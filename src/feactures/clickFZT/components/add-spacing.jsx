@@ -8,7 +8,6 @@ import {
 } from "@mui/material";
 import { useTheme } from "@emotion/react";
 import * as Yup from "yup";
-import Swal from "sweetalert2";
 import { Save, Pencil, FolderPlus } from "lucide-react";
 import FormInit from "@/common/components/form/form-init";
 import CreateDialog from "./create-dialog";
@@ -84,10 +83,13 @@ const AddSpacing = ({ openDialog, setOpenDialog }) => {
             await postData("api/clickfzt/spacing/", values);
             setOpenDialog(false);
           } catch (error) {
-            Swal.fire({
-              icon: "error",
-              title: "Error al guardar el espacio",
-              text: error.message,
+            enqueueSnackbar(error.message, {
+              variant: "error",
+              autoHideDuration: 3000,
+              anchorOrigin: {
+                vertical: "bottom",
+                horizontal: "left",
+              },
             });
           } finally {
             actions.setSubmitting(false);

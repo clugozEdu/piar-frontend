@@ -6,7 +6,7 @@ export const fetchSpaces = createAsyncThunk(
   "spaces/fetchSpaces",
   async (idAdvisor, { rejectWithValue }) => {
     try {
-      const response = await getData(`api/clickfzt/spacing/advisor/`);
+      const response = await getData(`api/clickfzt/space/advisor/`);
 
       // Aquí puedes transformar la respuesta si es necesario
       const transformedResponse = response

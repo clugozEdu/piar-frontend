@@ -9,7 +9,6 @@ import {
 import { useTheme } from "@emotion/react";
 import { Save, ListPlus, Pencil } from "lucide-react";
 import * as Yup from "yup";
-import Swal from "sweetalert2";
 import { getData, postData, putData } from "@/services/api";
 import FormInit from "@/common/components/form/form-init";
 import useLoading from "@/common/hooks/calllbacks/loading";
@@ -55,14 +54,17 @@ const AddList = ({
           setisLoadingDialog(false);
         });
       } catch (error) {
-        Swal.fire({
-          icon: "error",
-          title: "Error al obtener la lista",
-          text: error.message,
+        enqueueSnackbar(error.message, {
+          variant: "error",
+          autoHideDuration: 3000,
+          anchorOrigin: {
+            vertical: "bottom",
+            horizontal: "left",
+          },
         });
       }
     }
-  }, [context, idList, idSpacing]);
+  }, [context, idList, idSpacing, enqueueSnackbar]);
 
   const validateSchemaList = () =>
     Yup.object().shape({
@@ -131,10 +133,13 @@ const AddList = ({
               setOpenDialog(false);
               // setShowAlert(true);
             } catch (error) {
-              Swal.fire({
-                icon: "error",
-                title: "Error al guardar el espacio",
-                text: error.message,
+              enqueueSnackbar(error.message, {
+                variant: "error",
+                autoHideDuration: 3000,
+                anchorOrigin: {
+                  vertical: "bottom",
+                  horizontal: "left",
+                },
               });
             } finally {
               actions.setSubmitting(false);

@@ -8,7 +8,6 @@ import SelectFormField from "@/common/components/shares/SelectFormField";
 import FormInit from "@/common/components/form/form-init";
 import { getData, postData } from "@/services/api";
 import TaskForm from "../forms/task-form";
-import Swal from "sweetalert2";
 import { useSnackbar } from "notistack";
 
 const AddTask = ({
@@ -43,13 +42,16 @@ const AddTask = ({
       }
       setLoadingDialog(false);
     } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Error al obtener los datos",
-        text: error.message,
+      enqueueSnackbar(error.message, {
+        variant: "error",
+        autoHideDuration: 3000,
+        anchorOrigin: {
+          vertical: "bottom",
+          horizontal: "left",
+        },
       });
     }
-  }, [idList, setIsDialogOpen]);
+  }, [idList, setIsDialogOpen, enqueueSnackbar]);
 
   // Determine if the current status is "Backlog"
   const isBacklog = statusTask.some(
@@ -61,7 +63,13 @@ const AddTask = ({
       title: Yup.string().required("El título es requerido"),
       description: Yup.string().notRequired(),
       start_date: !isBacklog
-        ? Yup.date().nullable().required("La fecha de inicio es requerida")
+        ? Yup.date()
+            .nullable()
+            .required("La fecha de inicio es requerida")
+            .max(
+              Yup.ref("end_date"),
+              "La fecha de inicio debe ser anterior a la fecha de finalización"
+            )
         : Yup.date().nullable().notRequired(),
       end_date: !isBacklog
         ? Yup.date()
@@ -91,10 +99,13 @@ const AddTask = ({
       await postData("api/clickfzt/tasks", values);
       setIsDialogOpen(false);
     } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Error al guardar la tarea",
-        text: error.message,
+      enqueueSnackbar(error.message, {
+        variant: "error",
+        autoHideDuration: 3000,
+        anchorOrigin: {
+          vertical: "bottom",
+          horizontal: "left",
+        },
       });
     } finally {
       actions.setSubmitting(false);
